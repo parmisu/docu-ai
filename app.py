@@ -8,105 +8,762 @@ from langchain_ollama import ChatOllama
 from langchain_core.documents import Document
 
 
+# ==================================================
+# PAGE CONFIG
+# ==================================================
+
 st.set_page_config(
     page_title="Docu AI",
-    page_icon="📄",
-    layout="centered"
+    page_icon="✦",
+    layout="centered",
 )
 
-st.title("📄 Docu AI")
-st.write("Upload your documents and ask questions about them.")
 
+# ==================================================
+# CUSTOM CSS
+# ==================================================
+
+st.markdown(
+    """
+<style>
+
+/* ---------- GLOBAL ---------- */
+
+.stApp {
+    background:
+        radial-gradient(
+            circle at 15% 5%,
+            rgba(222, 230, 255, 0.68),
+            transparent 30%
+        ),
+        radial-gradient(
+            circle at 85% 8%,
+            rgba(244, 226, 255, 0.62),
+            transparent 28%
+        ),
+        linear-gradient(
+            180deg,
+            #fcfcff 0%,
+            #f7f8fd 100%
+        );
+    color: #282b38;
+}
+
+
+/* Keep everything narrow + centered */
+.block-container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding-top: 2.2rem;
+    padding-bottom: 5rem;
+}
+
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+
+/* ---------- HERO ---------- */
+
+..hero {
+    text-align: center;
+    padding: 0.3rem 0 1.7rem 0;
+    animation: fadeUp 0.65s ease both;
+}
+
+.hero-title {
+    font-size: 2.55rem;
+    line-height: 1.05;
+    font-weight: 750;
+    letter-spacing: -0.045em;
+    margin: 0;
+    color: #272937;
+}
+
+.hero-subtitle {
+    margin-top: 0.7rem;
+    font-size: 1rem;
+    color: #7a7f90;
+}
+
+
+/* ---------- LOCAL BADGE ---------- */
+
+.local-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+
+    margin-top: 1rem;
+    padding: 0.48rem 0.82rem;
+
+    border-radius: 999px;
+
+    background: rgba(255, 255, 255, 0.78);
+
+    border:
+        1px solid rgba(184, 190, 214, 0.42);
+
+    backdrop-filter: blur(14px);
+
+    color: #626779;
+    font-size: 0.84rem;
+
+    box-shadow:
+        0 9px 28px rgba(80, 86, 130, 0.07);
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+
+    border-radius: 50%;
+
+    background: #89d7aa;
+
+    box-shadow:
+        0 0 0 5px rgba(137, 215, 170, 0.12);
+}
+
+
+/* ---------- AI ORB ---------- */
+
+.orb-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.6rem;
+}
+
+.orb {
+    width: 132px;
+    height: 132px;
+    border-radius: 50%;
+
+    background:
+        radial-gradient(circle at 32% 28%,
+            rgba(255,255,255,0.98) 0%,
+            rgba(220,235,255,0.96) 18%,
+            rgba(208,197,255,0.92) 43%,
+            rgba(255,205,232,0.88) 68%,
+            rgba(203,236,255,0.88) 100%
+        );
+
+    box-shadow:
+        0 18px 45px rgba(171, 180, 255, 0.24),
+        0 32px 85px rgba(215, 183, 255, 0.22),
+        inset -12px -12px 30px rgba(195, 190, 255, 0.20),
+        inset 12px 12px 28px rgba(255,255,255,0.72);
+
+    filter: saturate(1.05);
+
+    animation:
+        floatOrb 7s ease-in-out infinite,
+        glowOrb 6s ease-in-out infinite alternate;
+}
+
+
+/* ---------- GENERAL SOFT CARD ---------- */
+
+.glass-card {
+    max-width: 680px;
+    margin: 1rem auto;
+
+    background:
+        rgba(255, 255, 255, 0.78);
+
+    backdrop-filter: blur(18px);
+
+    border:
+        1px solid rgba(190, 196, 220, 0.42);
+
+    border-radius: 24px;
+
+    padding: 1.25rem 1.35rem;
+
+    box-shadow:
+        0 16px 44px rgba(69, 75, 112, 0.07);
+
+    animation:
+        fadeUp 0.5s ease both;
+}
+
+.glass-card:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 22px 55px rgba(69, 75, 112, 0.1);
+}
+
+
+/* ---------- LABELS ---------- */
+
+.section-label {
+    font-size: 0.76rem;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.13em;
+
+    font-weight: 800;
+
+    color: #9b9faf;
+
+    margin-bottom: 0.55rem;
+}
+
+.doc-name {
+    font-size: 1.02rem;
+    font-weight: 700;
+
+    color: #333746;
+}
+
+.doc-meta {
+    margin-top: 0.3rem;
+
+    color: #8a8f9f;
+
+    font-size: 0.88rem;
+}
+
+
+/* ---------- FILE UPLOADER ---------- */
+
+[data-testid="stFileUploader"] {
+    max-width: 680px;
+
+    margin-left: auto;
+    margin-right: auto;
+
+    background:
+        rgba(255, 255, 255, 0.75);
+
+    border:
+        1px solid rgba(188, 194, 218, 0.42);
+
+    border-radius: 24px;
+
+    padding: 0.85rem;
+
+    box-shadow:
+        0 16px 42px rgba(69, 75, 112, 0.065);
+
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+[data-testid="stFileUploader"]:hover {
+    transform: translateY(-2px);
+
+    border-color:
+        rgba(164, 175, 238, 0.75);
+
+    box-shadow:
+        0 21px 52px rgba(86, 94, 148, 0.11);
+}
+
+[data-testid="stFileUploader"] button {
+    border: none !important;
+
+    border-radius: 16px !important;
+
+    background:
+        linear-gradient(
+            135deg,
+            #e8edff,
+            #f5e6ff
+        ) !important;
+
+    color: #484d63 !important;
+
+    font-weight: 700 !important;
+
+    transition:
+        transform 0.16s ease,
+        box-shadow 0.2s ease;
+}
+
+[data-testid="stFileUploader"] button:hover {
+    transform:
+        translateY(-1px)
+        scale(1.02);
+
+    box-shadow:
+        0 9px 24px rgba(108, 117, 177, 0.15);
+}
+
+[data-testid="stFileUploader"] button:active {
+    transform: scale(0.97);
+}
+
+
+/* ---------- QUESTION INPUT ---------- */
+
+.stTextInput {
+    max-width: 680px;
+
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.stTextInput > div > div > input {
+    border-radius: 20px !important;
+
+    border:
+        1px solid rgba(182, 188, 212, 0.5) !important;
+
+    background:
+        rgba(255, 255, 255, 0.88) !important;
+
+    padding:
+        0.92rem 1rem !important;
+
+    font-size:
+        1rem !important;
+
+    box-shadow:
+        0 11px 30px rgba(72, 78, 119, 0.06);
+
+    transition:
+        transform 0.18s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.stTextInput > div > div > input:hover {
+    border-color:
+        rgba(164, 174, 232, 0.85) !important;
+}
+
+.stTextInput > div > div > input:focus {
+    transform:
+        translateY(-1px);
+
+    border-color:
+        #b5b9ff !important;
+
+    box-shadow:
+        0 0 0 4px rgba(181, 185, 255, 0.12),
+        0 14px 34px rgba(80, 86, 140, 0.10) !important;
+}
+
+
+/* ---------- ANSWER CONTAINER ---------- */
+
+[data-testid="stVerticalBlockBorderWrapper"] {
+    max-width: 680px;
+
+    margin:
+        0.7rem auto 0 auto;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,0.95),
+            rgba(247,248,255,0.90)
+        );
+
+    border:
+        1px solid rgba(188,195,221,0.42) !important;
+
+    border-radius:
+        24px !important;
+
+    padding:
+        1.1rem 1.25rem !important;
+
+    box-shadow:
+        0 18px 46px rgba(71,76,116,0.075);
+
+    animation:
+        answerIn 0.5s cubic-bezier(.2,.8,.2,1) both;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+[data-testid="stVerticalBlockBorderWrapper"]:hover {
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 22px 56px rgba(71,76,116,0.105);
+}
+
+
+/* Remove excessive gaps inside answer */
+[data-testid="stVerticalBlockBorderWrapper"]
+[data-testid="stVerticalBlock"] {
+    gap: 0.45rem;
+}
+
+
+/* ---------- SOURCES ---------- */
+
+details {
+    width: 100%;
+    max-width: 650px;
+
+    margin:
+        0 auto 0.55rem auto !important;
+
+    border-radius:
+        17px !important;
+
+    border:
+        1px solid rgba(190,196,216,0.45) !important;
+
+    background:
+        rgba(255,255,255,0.76) !important;
+
+    overflow: hidden;
+
+    box-shadow: none !important;
+
+    transition:
+        transform 0.18s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+}
+
+details:hover {
+    transform:
+        translateY(-2px);
+
+    background:
+        rgba(250,250,255,0.94) !important;
+
+    border-color:
+        rgba(166,176,236,0.72) !important;
+
+    box-shadow:
+        0 10px 28px rgba(87,93,140,0.07) !important;
+}
+
+details summary {
+    font-size:
+        0.91rem;
+
+    color:
+        #626879;
+
+    cursor:
+        pointer;
+}
+
+
+/* ---------- SPINNER ---------- */
+
+[data-testid="stSpinner"] {
+    max-width: 680px;
+
+    margin-left: auto;
+    margin-right: auto;
+
+    padding:
+        0.6rem 0;
+}
+
+
+/* ---------- ANIMATIONS ---------- */
+
+@keyframes fadeUp {
+
+    from {
+        opacity: 0;
+        transform:
+            translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform:
+            translateY(0);
+    }
+}
+
+
+@keyframes answerIn {
+
+    from {
+        opacity: 0;
+
+        transform:
+            translateY(16px)
+            scale(0.987);
+    }
+
+    to {
+        opacity: 1;
+
+        transform:
+            translateY(0)
+            scale(1);
+    }
+}
+
+
+@keyframes floatOrb {
+
+    0%,
+    100% {
+        transform:
+            translateY(0);
+    }
+
+    50% {
+        transform:
+            translateY(-8px);
+    }
+}
+
+
+@keyframes glowOrb {
+
+    from {
+        box-shadow:
+            0 18px 44px rgba(167,178,255,0.30),
+            inset 0 0 30px rgba(255,255,255,0.72);
+    }
+
+    to {
+        box-shadow:
+            0 25px 67px rgba(214,176,255,0.42),
+            inset 0 0 40px rgba(255,255,255,0.93);
+    }
+}
+
+</style>
+""",
+    unsafe_allow_html=True,
+)
+
+
+# ==================================================
+# HERO
+# ==================================================
+
+st.markdown(
+    """
+<div class="hero">
+<div class="orb-wrap"><div class="orb"></div></div>
+<h1 class="hero-title">Docu AI</h1>
+<div class="hero-subtitle">Ask your documents anything.</div>
+<div class="local-badge">
+<span class="status-dot"></span>
+Local AI · Private · Runs on device
+</div>
+</div>
+""",
+    unsafe_allow_html=True,
+)
+
+
+# ==================================================
+# UPLOAD
+# ==================================================
 
 uploaded_file = st.file_uploader(
     "Upload a PDF document",
-    type=["pdf"]
+    type=["pdf"],
+    label_visibility="collapsed",
 )
 
 
+# ==================================================
+# DOCUMENT PROCESSING
+# ==================================================
+
 if uploaded_file is not None:
-    st.success(f"Uploaded: {uploaded_file.name}")
 
-    reader = PdfReader(uploaded_file)
+    with st.spinner(
+        "Reading your document..."
+    ):
 
-    st.write(f"Number of pages: {len(reader.pages)}")
+        reader = PdfReader(
+            uploaded_file
+        )
 
-    # Create one LangChain Document per PDF page
-    page_documents = []
+        page_documents = []
 
-    for page_number, page in enumerate(reader.pages, start=1):
-        page_text = page.extract_text()
+        for page_number, page in enumerate(
+            reader.pages,
+            start=1,
+        ):
 
-        if page_text:
-            page_documents.append(
-                Document(
-                    page_content=page_text,
-                    metadata={
-                        "source": uploaded_file.name,
-                        "page": page_number
-                    }
+            page_text = page.extract_text()
+
+            if page_text:
+
+                page_documents.append(
+                    Document(
+                        page_content=page_text,
+                        metadata={
+                            "source":
+                                uploaded_file.name,
+
+                            "page":
+                                page_number,
+                        },
+                    )
+                )
+
+
+    # ----------------------------------------------
+    # CHUNKING
+    # ----------------------------------------------
+
+    with st.spinner(
+        "Preparing document context..."
+    ):
+
+        text_splitter = (
+            RecursiveCharacterTextSplitter(
+                chunk_size=1000,
+                chunk_overlap=200,
+            )
+        )
+
+        chunks = (
+            text_splitter
+            .split_documents(
+                page_documents
+            )
+        )
+
+
+    # ----------------------------------------------
+    # DOCUMENT STATUS CARD
+    # ----------------------------------------------
+
+    st.markdown(
+        (
+            '<div class="glass-card">'
+            '<div class="section-label">'
+            'Document ready'
+            '</div>'
+            '<div class="doc-name">'
+            f'📄 {uploaded_file.name}'
+            '</div>'
+            '<div class="doc-meta">'
+            f'{len(reader.pages)} pages'
+            ' · '
+            f'{len(chunks)} chunks'
+            ' · Ready to search'
+            '</div>'
+            '</div>'
+        ),
+        unsafe_allow_html=True,
+    )
+
+
+    # ----------------------------------------------
+    # EMBEDDINGS
+    # ----------------------------------------------
+
+    with st.spinner(
+        "Creating semantic index..."
+    ):
+
+        embeddings = (
+            HuggingFaceEmbeddings(
+                model_name=(
+                    "sentence-transformers/"
+                    "all-MiniLM-L6-v2"
+                )
+            )
+        )
+
+        vector_store = (
+            Chroma.from_documents(
+                documents=chunks,
+                embedding=embeddings,
+            )
+        )
+
+
+    # ----------------------------------------------
+    # QUESTION
+    # ----------------------------------------------
+
+    question = st.text_input(
+        "Ask a question about the document",
+        placeholder=(
+            "Ask anything about "
+            "your document..."
+        ),
+    )
+
+
+    # ==================================================
+    # RAG
+    # ==================================================
+
+    if question:
+
+        # ------------------------------------------
+        # RETRIEVAL
+        # ------------------------------------------
+
+        with st.spinner(
+            "Searching your document..."
+        ):
+
+            results = (
+                vector_store
+                .similarity_search(
+                    question,
+                    k=5,
                 )
             )
 
-    # Split each page while preserving metadata
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
-        chunk_overlap=200
-    )
+            context = "\n\n".join(
+                (
+                    f"[Page "
+                    f"{result.metadata.get('page', 'Unknown')}"
+                    f"]\n"
+                    f"{result.page_content}"
+                )
+                for result in results
+            )
 
-    chunks = text_splitter.split_documents(page_documents)
 
-    st.write(f"Number of chunks: {len(chunks)}")
+        # ------------------------------------------
+        # GENERATION
+        # ------------------------------------------
 
-    # Show first few chunks for debugging
-    st.subheader("Text Chunks")
-
-    for i, chunk in enumerate(chunks[:5], start=1):
-        with st.expander(
-            f"Chunk {i} — Page {chunk.metadata['page']}"
+        with st.spinner(
+            "Thinking..."
         ):
-            st.write(chunk.page_content)
 
-    # Local embeddings
-    embeddings = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/all-MiniLM-L6-v2"
-    )
+            llm = ChatOllama(
+                model="llama3.2:3b",
+                temperature=0,
+            )
 
-    # Store chunks + metadata in Chroma
-    vector_store = Chroma.from_documents(
-        documents=chunks,
-        embedding=embeddings
-    )
+            prompt = f"""
+You are a document question-answering assistant.
 
-    question = st.text_input(
-        "Ask a question about the document"
-    )
+Answer the user's question using ONLY the document
+context below.
 
-    if question:
-        results = vector_store.similarity_search(
-            question,
-            k=5
-        )
-
-        context = "\n\n".join(
-            f"[Page {result.metadata['page']}]\n{result.page_content}"
-            for result in results
-        )
-
-        llm = ChatOllama(
-            model="llama3.2:3b",
-            temperature=0
-        )
-
-        prompt = f"""
-Answer the question using only the document context below.
-
-Use all relevant information from the context.
-If the document contains a list, reproduce the complete list.
-Do not invent information.
-
-If the answer truly does not appear in the context, say:
-"I could not find the answer in the uploaded document."
+Rules:
+- Use all relevant information from the context.
+- Preserve the structure and meaning of the source.
+- If the source contains a numbered list or table,
+  follow that structure.
+- Do not split acceptance criteria into separate items
+  unless the source lists them separately.
+- Do not invent information.
+- If the answer truly does not appear in the context,
+  say:
+  "I could not find the answer in the uploaded document."
 
 Document context:
 {context}
@@ -117,25 +774,149 @@ Question:
 Answer:
 """
 
-        response = llm.invoke(prompt)
-
-        st.subheader("Answer")
-        st.write(response.content)
-
-        st.subheader("Sources")
-
-        for i, result in enumerate(results, start=1):
-            source_name = result.metadata.get(
-                "source",
-                "Unknown document"
+            response = (
+                llm.invoke(
+                    prompt
+                )
             )
 
-            page_number = result.metadata.get(
-                "page",
-                "Unknown page"
+
+        # ==================================================
+        # ANSWER
+        # ==================================================
+
+        with st.container(
+            border=True
+        ):
+
+            st.markdown(
+                (
+                    '<div class="section-label">'
+                    'Answer'
+                    '</div>'
+                ),
+                unsafe_allow_html=True,
+            )
+
+            st.markdown(
+                response.content
+            )
+
+
+        # ==================================================
+        # UNIQUE SOURCES
+        # ==================================================
+
+        unique_sources = {}
+
+        for result in results:
+
+            source_name = (
+                result.metadata.get(
+                    "source",
+                    "Unknown document",
+                )
+            )
+
+            page_number = (
+                result.metadata.get(
+                    "page",
+                    "Unknown page",
+                )
+            )
+
+            key = (
+                source_name,
+                page_number,
+            )
+
+            if key not in unique_sources:
+
+                unique_sources[key] = result
+
+
+        # ----------------------------------------------
+        # SOURCE LABEL
+        # ----------------------------------------------
+
+        st.markdown(
+            (
+                '<div class="section-label" '
+                'style="max-width:650px; '
+                'margin:1.5rem auto 0.7rem auto;">'
+                'Sources'
+                '</div>'
+            ),
+            unsafe_allow_html=True,
+        )
+
+
+        # ----------------------------------------------
+        # SOURCE CARDS
+        # ----------------------------------------------
+
+        for result in unique_sources.values():
+
+            source_name = (
+                result.metadata.get(
+                    "source",
+                    "Unknown document",
+                )
+            )
+
+            page_number = (
+                result.metadata.get(
+                    "page",
+                    "Unknown page",
+                )
             )
 
             with st.expander(
-                f"Source {i} — {source_name} — Page {page_number}"
+                (
+                    f"Page {page_number}"
+                    f" · "
+                    f"{source_name}"
+                )
             ):
-                st.write(result.page_content)
+
+                st.write(
+                    result.page_content
+                )
+
+
+# ==================================================
+# EMPTY STATE
+# ==================================================
+
+else:
+
+    st.markdown(
+        (
+            '<div class="glass-card" '
+            'style="text-align:center;">'
+
+            '<div class="section-label">'
+            'Start here'
+            '</div>'
+
+            '<div style="'
+            'font-size:1.08rem;'
+            'font-weight:700;'
+            'margin-bottom:0.35rem;'
+            '">'
+            'Drop in a PDF'
+            '</div>'
+
+            '<div style="'
+            'color:#8b90a0;'
+            'font-size:0.92rem;'
+            'line-height:1.6;'
+            '">'
+            'Docu AI will create a searchable semantic index '
+            'and answer questions using your document.'
+            '</div>'
+
+            '</div>'
+        ),
+        unsafe_allow_html=True,
+    )
