@@ -1,4 +1,19 @@
+import re
 import streamlit as st
+
+@st.cache_resource
+def get_embeddings():
+    return HuggingFaceEmbeddings(
+        model_name="sentence-transformers/all-MiniLM-L6-v2"
+    )
+@st.cache_resource
+def get_vector_store(_documents):
+    embeddings = get_embeddings()
+
+    return Chroma.from_documents(
+        documents=_documents,
+        embedding=embeddings
+    )
 
 from pypdf import PdfReader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -47,10 +62,60 @@ st.markdown(
             #f7f8fd 100%
         );
     color: #282b38;
+
+    /* ---------- ASK BUTTON ---------- */
+
+[data-testid="stFormSubmitButton"] {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0.6rem;
 }
 
+[data-testid="stFormSubmitButton"] button {
+    width: auto !important;
 
-/* Keep everything narrow + centered */
+    border: none !important;
+
+    border-radius: 16px !important;
+
+    background:
+        linear-gradient(
+            135deg,
+            #e7edff,
+            #f3e3ff
+        ) !important;
+
+    color:
+        #454a5f !important;
+
+    font-weight:
+        700 !important;
+
+    padding:
+        0.7rem 1.15rem !important;
+
+    box-shadow:
+        0 10px 26px rgba(95, 103, 160, 0.10);
+
+    transition:
+        transform 0.18s ease,
+        box-shadow 0.2s ease;
+}
+
+[data-testid="stFormSubmitButton"] button:hover {
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 14px 32px rgba(95, 103, 160, 0.15);
+}
+
+[data-testid="stFormSubmitButton"] button:active {
+    transform:
+        scale(0.97);
+}
+}
+
 .block-container {
     max-width: 760px;
     margin: 0 auto;
@@ -58,8 +123,6 @@ st.markdown(
     padding-bottom: 5rem;
 }
 
-
-/* Smooth scrolling */
 html {
     scroll-behavior: smooth;
 }
@@ -67,25 +130,27 @@ html {
 
 /* ---------- HERO ---------- */
 
-..hero {
+.hero {
+    max-width: 680px;
+    margin: 0 auto;
     text-align: center;
-    padding: 0.3rem 0 1.7rem 0;
+    padding: 1.2rem 0 1.8rem 0;
     animation: fadeUp 0.65s ease both;
 }
 
 .hero-title {
-    font-size: 2.55rem;
-    line-height: 1.05;
-    font-weight: 750;
+    font-size: 2.15rem;
+    line-height: 1.1;
+    font-weight: 760;
     letter-spacing: -0.045em;
     margin: 0;
-    color: #272937;
+    color: #262936;
 }
 
 .hero-subtitle {
-    margin-top: 0.7rem;
+    margin-top: 0.65rem;
     font-size: 1rem;
-    color: #7a7f90;
+    color: #7b8091;
 }
 
 
@@ -94,25 +159,23 @@ html {
 .local-badge {
     display: inline-flex;
     align-items: center;
-    gap: 0.55rem;
+    gap: 0.5rem;
 
-    margin-top: 1rem;
-    padding: 0.48rem 0.82rem;
+    margin-top: 0.9rem;
+    padding: 0.42rem 0.72rem;
 
     border-radius: 999px;
 
-    background: rgba(255, 255, 255, 0.78);
+    background: rgba(255,255,255,0.78);
 
-    border:
-        1px solid rgba(184, 190, 214, 0.42);
+    border: 1px solid rgba(184,190,214,0.42);
 
     backdrop-filter: blur(14px);
 
-    color: #626779;
-    font-size: 0.84rem;
+    color: #666b7b;
+    font-size: 0.8rem;
 
-    box-shadow:
-        0 9px 28px rgba(80, 86, 130, 0.07);
+    box-shadow: 0 8px 22px rgba(80,86,130,0.06);
 }
 
 .status-dot {
@@ -128,43 +191,7 @@ html {
 }
 
 
-/* ---------- AI ORB ---------- */
-
-.orb-wrap {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 1.6rem;
-}
-
-.orb {
-    width: 132px;
-    height: 132px;
-    border-radius: 50%;
-
-    background:
-        radial-gradient(circle at 32% 28%,
-            rgba(255,255,255,0.98) 0%,
-            rgba(220,235,255,0.96) 18%,
-            rgba(208,197,255,0.92) 43%,
-            rgba(255,205,232,0.88) 68%,
-            rgba(203,236,255,0.88) 100%
-        );
-
-    box-shadow:
-        0 18px 45px rgba(171, 180, 255, 0.24),
-        0 32px 85px rgba(215, 183, 255, 0.22),
-        inset -12px -12px 30px rgba(195, 190, 255, 0.20),
-        inset 12px 12px 28px rgba(255,255,255,0.72);
-
-    filter: saturate(1.05);
-
-    animation:
-        floatOrb 7s ease-in-out infinite,
-        glowOrb 6s ease-in-out infinite alternate;
-}
-
-
-/* ---------- GENERAL SOFT CARD ---------- */
+/* ---------- GENERAL CARD ---------- */
 
 .glass-card {
     max-width: 680px;
@@ -301,54 +328,74 @@ html {
 }
 
 
-/* ---------- QUESTION INPUT ---------- */
+/* ---------- QUESTION COMPOSER ---------- */
 
 .stTextInput {
     max-width: 680px;
-
-    margin-left: auto;
-    margin-right: auto;
+    margin: 0.9rem auto 0 auto;
 }
 
-.stTextInput > div > div > input {
-    border-radius: 20px !important;
+.stTextInput label {
+    display: none;
+}
 
-    border:
-        1px solid rgba(182, 188, 212, 0.5) !important;
+.stTextInput > div {
+    position: relative;
+}
 
-    background:
-        rgba(255, 255, 255, 0.88) !important;
-
-    padding:
-        0.92rem 1rem !important;
-
-    font-size:
-        1rem !important;
+.stTextInput > div > div {
+    border-radius: 24px !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid rgba(186, 191, 216, 0.48) !important;
 
     box-shadow:
-        0 11px 30px rgba(72, 78, 119, 0.06);
+        0 14px 36px rgba(72, 78, 119, 0.07);
 
     transition:
-        transform 0.18s ease,
-        box-shadow 0.2s ease,
-        border-color 0.2s ease;
+        transform 0.2s ease,
+        box-shadow 0.22s ease,
+        border-color 0.22s ease;
 }
 
-.stTextInput > div > div > input:hover {
+.stTextInput > div > div:hover {
+    transform: translateY(-2px);
+
     border-color:
-        rgba(164, 174, 232, 0.85) !important;
+        rgba(161, 173, 236, 0.8) !important;
+
+    box-shadow:
+        0 18px 44px rgba(82, 89, 146, 0.1);
 }
 
-.stTextInput > div > div > input:focus {
-    transform:
-        translateY(-1px);
+.stTextInput > div > div:focus-within {
+    transform: translateY(-2px);
 
     border-color:
         #b5b9ff !important;
 
     box-shadow:
         0 0 0 4px rgba(181, 185, 255, 0.12),
-        0 14px 34px rgba(80, 86, 140, 0.10) !important;
+        0 20px 48px rgba(87, 93, 150, 0.12);
+}
+
+.stTextInput input {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+
+    padding:
+        1rem 1.1rem !important;
+
+    font-size:
+        1rem !important;
+
+    color:
+        #303442 !important;
+}
+
+.stTextInput input::placeholder {
+    color:
+        #a2a7b5 !important;
 }
 
 
@@ -395,8 +442,6 @@ html {
         0 22px 56px rgba(71,76,116,0.105);
 }
 
-
-/* Remove excessive gaps inside answer */
 [data-testid="stVerticalBlockBorderWrapper"]
 [data-testid="stVerticalBlock"] {
     gap: 0.45rem;
@@ -488,7 +533,6 @@ details summary {
     }
 }
 
-
 @keyframes answerIn {
 
     from {
@@ -508,37 +552,6 @@ details summary {
     }
 }
 
-
-@keyframes floatOrb {
-
-    0%,
-    100% {
-        transform:
-            translateY(0);
-    }
-
-    50% {
-        transform:
-            translateY(-8px);
-    }
-}
-
-
-@keyframes glowOrb {
-
-    from {
-        box-shadow:
-            0 18px 44px rgba(167,178,255,0.30),
-            inset 0 0 30px rgba(255,255,255,0.72);
-    }
-
-    to {
-        box-shadow:
-            0 25px 67px rgba(214,176,255,0.42),
-            inset 0 0 40px rgba(255,255,255,0.93);
-    }
-}
-
 </style>
 """,
     unsafe_allow_html=True,
@@ -552,7 +565,6 @@ details summary {
 st.markdown(
     """
 <div class="hero">
-<div class="orb-wrap"><div class="orb"></div></div>
 <h1 class="hero-title">Docu AI</h1>
 <div class="hero-subtitle">Ask your documents anything.</div>
 <div class="local-badge">
@@ -579,16 +591,14 @@ uploaded_file = st.file_uploader(
 # ==================================================
 # DOCUMENT PROCESSING
 # ==================================================
+question = ""
+submitted = False
 
 if uploaded_file is not None:
 
-    with st.spinner(
-        "Reading your document..."
-    ):
+    with st.spinner("Reading your document..."):
 
-        reader = PdfReader(
-            uploaded_file
-        )
+        reader = PdfReader(uploaded_file)
 
         page_documents = []
 
@@ -605,11 +615,8 @@ if uploaded_file is not None:
                     Document(
                         page_content=page_text,
                         metadata={
-                            "source":
-                                uploaded_file.name,
-
-                            "page":
-                                page_number,
+                            "source": uploaded_file.name,
+                            "page": page_number,
                         },
                     )
                 )
@@ -619,22 +626,15 @@ if uploaded_file is not None:
     # CHUNKING
     # ----------------------------------------------
 
-    with st.spinner(
-        "Preparing document context..."
-    ):
+    with st.spinner("Preparing document context..."):
 
-        text_splitter = (
-            RecursiveCharacterTextSplitter(
-                chunk_size=1000,
-                chunk_overlap=200,
-            )
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=1000,
+            chunk_overlap=200,
         )
 
-        chunks = (
-            text_splitter
-            .split_documents(
-                page_documents
-            )
+        chunks = text_splitter.split_documents(
+            page_documents
         )
 
 
@@ -664,259 +664,266 @@ if uploaded_file is not None:
 
 
     # ----------------------------------------------
-    # EMBEDDINGS
+    # EMBEDDINGS + VECTOR STORE
     # ----------------------------------------------
 
-    with st.spinner(
-        "Creating semantic index..."
-    ):
-
-        embeddings = (
-            HuggingFaceEmbeddings(
-                model_name=(
-                    "sentence-transformers/"
-                    "all-MiniLM-L6-v2"
-                )
-            )
-        )
-
-        vector_store = (
-            Chroma.from_documents(
-                documents=chunks,
-                embedding=embeddings,
-            )
-        )
+    with st.spinner("Creating semantic index..."):
+         vector_store = get_vector_store(chunks)
 
 
     # ----------------------------------------------
     # QUESTION
     # ----------------------------------------------
 
-    question = st.text_input(
-        "Ask a question about the document",
-        placeholder=(
-            "Ask anything about "
-            "your document..."
-        ),
-    )
+        # ----------------------------------------------
+    # QUESTION FORM
+    # ----------------------------------------------
 
+    with st.form("question_form"):
+
+        question = st.text_input(
+            "Ask a question about the document",
+            placeholder="Ask anything about your document...",
+            label_visibility="collapsed",
+        )
+
+        submitted = st.form_submit_button("Ask")
+
+    clean_question = question.strip()
 
     # ==================================================
-    # RAG
+    # VALIDATION + RAG
     # ==================================================
 
-    if question:
+if submitted and clean_question:
+
+        has_letters_or_numbers = bool(
+            re.search(
+                r"[A-Za-z0-9]",
+                clean_question
+            )
+        )
 
         # ------------------------------------------
-        # RETRIEVAL
+        # BASIC VALIDATION
         # ------------------------------------------
 
-        with st.spinner(
-            "Searching your document..."
-        ):
+        if len(clean_question) < 3:
 
-            results = (
+            st.warning(
+                "Please enter a longer question."
+            )
+
+
+        elif not has_letters_or_numbers:
+
+            st.warning(
+                "Please enter a question using words, "
+                "not only emojis or symbols."
+            )
+
+
+        elif len(clean_question) > 500:
+
+            st.warning(
+                "Your question is too long. "
+                "Please keep it under 500 characters."
+            )
+
+
+        else:
+
+            # --------------------------------------
+            # SEMANTIC RETRIEVAL
+            # --------------------------------------
+
+            scored_results = (
                 vector_store
-                .similarity_search(
-                    question,
+                .similarity_search_with_relevance_scores(
+                    clean_question,
                     k=5,
                 )
             )
 
-            context = "\n\n".join(
-                (
-                    f"[Page "
-                    f"{result.metadata.get('page', 'Unknown')}"
-                    f"]\n"
-                    f"{result.page_content}"
+
+            if not scored_results:
+
+                st.warning(
+                    "I couldn't find anything relevant "
+                    "in this document."
                 )
-                for result in results
-            )
 
 
-        # ------------------------------------------
-        # GENERATION
-        # ------------------------------------------
+            else:
 
-        with st.spinner(
-            "Thinking..."
-        ):
+                best_score = scored_results[0][1]
 
-            llm = ChatOllama(
-                model="llama3.2:3b",
-                temperature=0,
-            )
+                # Temporary threshold for this local setup.
+                # We can tune this after testing.
+                if best_score < 0.15:
 
-            prompt = f"""
+                    st.warning(
+                        "I couldn't find anything relevant "
+                        "to that question in this document."
+                    )
+
+
+                else:
+
+                    results = [
+                        document
+                        for document, score in scored_results
+                    ]
+
+
+                    context = "\n\n".join(
+                        (
+                            f"[Page "
+                            f"{result.metadata.get('page', 'Unknown')}"
+                            f"]\n"
+                            f"{result.page_content}"
+                        )
+                        for result in results
+                    )
+
+
+                    # ----------------------------------
+                    # GENERATION
+                    # ----------------------------------
+
+                    with st.spinner("Thinking..."):
+
+                        llm = ChatOllama(
+                            model="llama3.2:3b",
+                            temperature=0,
+                        )
+
+
+                        prompt = f"""
 You are a document question-answering assistant.
 
-Answer the user's question using ONLY the document
-context below.
+Answer the user's question using ONLY the document context below.
 
 Rules:
 - Use all relevant information from the context.
 - Preserve the structure and meaning of the source.
-- If the source contains a numbered list or table,
-  follow that structure.
-- Do not split acceptance criteria into separate items
-  unless the source lists them separately.
+- If the source contains a numbered list or table, follow that structure.
+- Do not split acceptance criteria into separate items unless the source lists them separately.
 - Do not invent information.
-- If the answer truly does not appear in the context,
-  say:
+- If the answer truly does not appear in the context, say:
   "I could not find the answer in the uploaded document."
 
 Document context:
 {context}
 
 Question:
-{question}
+{clean_question}
 
 Answer:
 """
 
-            response = (
-                llm.invoke(
-                    prompt
-                )
-            )
+
+                        response = llm.invoke(
+                            prompt
+                        )
 
 
-        # ==================================================
-        # ANSWER
-        # ==================================================
+                    # ----------------------------------
+                    # ANSWER
+                    # ----------------------------------
 
-        with st.container(
-            border=True
-        ):
+                    with st.container(
+                        border=True
+                    ):
 
-            st.markdown(
-                (
-                    '<div class="section-label">'
-                    'Answer'
-                    '</div>'
-                ),
-                unsafe_allow_html=True,
-            )
+                        st.markdown(
+                            '<div class="section-label">Answer</div>',
+                            unsafe_allow_html=True,
+                        )
 
-            st.markdown(
-                response.content
-            )
+                        st.markdown(
+                            response.content
+                        )
 
 
-        # ==================================================
-        # UNIQUE SOURCES
-        # ==================================================
+                    # ----------------------------------
+                    # UNIQUE SOURCES
+                    # ----------------------------------
 
-        unique_sources = {}
-
-        for result in results:
-
-            source_name = (
-                result.metadata.get(
-                    "source",
-                    "Unknown document",
-                )
-            )
-
-            page_number = (
-                result.metadata.get(
-                    "page",
-                    "Unknown page",
-                )
-            )
-
-            key = (
-                source_name,
-                page_number,
-            )
-
-            if key not in unique_sources:
-
-                unique_sources[key] = result
+                    unique_sources = {}
 
 
-        # ----------------------------------------------
-        # SOURCE LABEL
-        # ----------------------------------------------
+                    for result in results:
 
-        st.markdown(
-            (
-                '<div class="section-label" '
-                'style="max-width:650px; '
-                'margin:1.5rem auto 0.7rem auto;">'
-                'Sources'
-                '</div>'
-            ),
-            unsafe_allow_html=True,
-        )
+                        source_name = (
+                            result.metadata.get(
+                                "source",
+                                "Unknown document",
+                            )
+                        )
+
+                        page_number = (
+                            result.metadata.get(
+                                "page",
+                                "Unknown page",
+                            )
+                        )
+
+                        key = (
+                            source_name,
+                            page_number,
+                        )
+
+                        if key not in unique_sources:
+
+                            unique_sources[key] = result
 
 
-        # ----------------------------------------------
-        # SOURCE CARDS
-        # ----------------------------------------------
+                    # ----------------------------------
+                    # SOURCE LABEL
+                    # ----------------------------------
 
-        for result in unique_sources.values():
+                    st.markdown(
+                        (
+                            '<div class="section-label" '
+                            'style="max-width:650px; '
+                            'margin:1.5rem auto 0.7rem auto;">'
+                            'Sources'
+                            '</div>'
+                        ),
+                        unsafe_allow_html=True,
+                    )
 
-            source_name = (
-                result.metadata.get(
-                    "source",
-                    "Unknown document",
-                )
-            )
 
-            page_number = (
-                result.metadata.get(
-                    "page",
-                    "Unknown page",
-                )
-            )
+                    # ----------------------------------
+                    # SOURCE CARDS
+                    # ----------------------------------
 
-            with st.expander(
-                (
-                    f"Page {page_number}"
-                    f" · "
-                    f"{source_name}"
-                )
-            ):
+                    for result in unique_sources.values():
 
-                st.write(
-                    result.page_content
-                )
+                        source_name = (
+                            result.metadata.get(
+                                "source",
+                                "Unknown document",
+                            )
+                        )
+
+                        page_number = (
+                            result.metadata.get(
+                                "page",
+                                "Unknown page",
+                            )
+                        )
+
+                        with st.expander(
+                            f"Page {page_number} · {source_name}"
+                        ):
+
+                            st.write(
+                                result.page_content
+                            )
 
 
 # ==================================================
 # EMPTY STATE
 # ==================================================
-
-else:
-
-    st.markdown(
-        (
-            '<div class="glass-card" '
-            'style="text-align:center;">'
-
-            '<div class="section-label">'
-            'Start here'
-            '</div>'
-
-            '<div style="'
-            'font-size:1.08rem;'
-            'font-weight:700;'
-            'margin-bottom:0.35rem;'
-            '">'
-            'Drop in a PDF'
-            '</div>'
-
-            '<div style="'
-            'color:#8b90a0;'
-            'font-size:0.92rem;'
-            'line-height:1.6;'
-            '">'
-            'Docu AI will create a searchable semantic index '
-            'and answer questions using your document.'
-            '</div>'
-
-            '</div>'
-        ),
-        unsafe_allow_html=True,
-    )
