@@ -65,3 +65,19 @@ Retrieved Context
 Local LLM via Ollama
     ↓
 Answer + Source Pages
+```
+
+
+## Screenshots
+
+### Home
+
+![Docu AI Home](docs/home.png)
+
+### Document Q&A
+
+![Docu AI Answer](docs/answer.png)
+
+### Validation / Error Handling
+
+![Docu AI Validation](docs/error.png)
