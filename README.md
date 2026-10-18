@@ -81,3 +81,13 @@ Answer + Source Pages
 ### Validation / Error Handling
 
 ![Docu AI Validation](docs/error.png)
+
+## Deployment
+
+The current version is designed as a local-first application.
+
+Because answer generation uses Ollama with a local Llama model, the application is intended to run on a user's machine rather than on a standard hosted Streamlit environment.
+
+This keeps the project free to run and avoids paid API dependencies.
+
+A future version could support optional cloud LLM providers for public deployment.
