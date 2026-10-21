@@ -1,0 +1,8 @@
+=== T05 INITIAL TEST INVENTORY ===
+
+=== PYTEST AVAILABILITY ===
+/Users/parmisu/docu-ai/.venv/bin/python: No module named pytest
+
+=== EXISTING TEST FILES ===
+
+=== TEST DIRECTORIES ===
