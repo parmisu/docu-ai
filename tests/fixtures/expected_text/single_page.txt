@@ -1,0 +1,3 @@
+Docu AI PDF Extraction Fixture
+This single-page PDF contains known text for deterministic extraction testing.
+The extraction test should preserve all essential words and meaning.
