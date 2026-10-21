@@ -1,0 +1,39 @@
+BASELINE RUN: baseline-001
+
+Document:
+Project Brief - Docu AI.pdf
+
+Question:
+What technologies are required for this project?
+
+PDF processing time:
+15 seconds
+
+Answer generation time:
+10 seconds
+
+Approximate end-to-end time:
+25 seconds
+
+Actual answer:
+According to the document, the required technologies for this project are:
+
+1. Core Language: Python 3.10+
+2. AI Framework: LangChain or LlamaIndex
+3. Vector Database: FAISS or ChromaDB
+4. Language Model API: OpenAI API (gpt-4o-mini or similar)
+5. User Interface (UI): Streamlit
+6. Version Control: Git & GitHub
+
+Sources returned:
+Page 2 - Project Brief - Docu AI.pdf
+Page 5 - Project Brief - Docu AI.pdf
+Page 4 - Project Brief - Docu AI.pdf
+Page 1 - Project Brief - Docu AI.pdf
+Page 3 - Project Brief - Docu AI.pdf
+
+Runtime errors:
+None observed.
+
+Result:
+Completed successfully.
