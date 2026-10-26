@@ -621,7 +621,13 @@ if uploaded_file is not None:
                     )
                 )
 
-
+if not page_documents:
+    st.warning(
+        "No extractable text was found in this PDF. "
+        "The document may be empty, scanned, or image-only. "
+        "OCR is not currently supported."
+    )
+    st.stop()
     # ----------------------------------------------
     # CHUNKING
     # ----------------------------------------------
