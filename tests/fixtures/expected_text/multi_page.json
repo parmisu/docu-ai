@@ -1,0 +1,16 @@
+{
+  "pages": [
+    {
+      "page": 1,
+      "text": "Docu AI Multi-Page Fixture Page One\nThis is the first page of the controlled test document."
+    },
+    {
+      "page": 2,
+      "text": "Docu AI Multi-Page Fixture Page Two\nThis is the second page of the controlled test document."
+    },
+    {
+      "page": 3,
+      "text": "Docu AI Multi-Page Fixture Page Three\nThis is the third page of the controlled test document."
+    }
+  ]
+}
