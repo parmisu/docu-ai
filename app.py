@@ -21,7 +21,7 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 from langchain_ollama import ChatOllama
 from langchain_core.documents import Document
-
+from pdf_validation import has_pdf_signature
 
 # ==================================================
 # PAGE CONFIG
@@ -595,7 +595,13 @@ question = ""
 submitted = False
 
 if uploaded_file is not None:
-
+    if not has_pdf_signature(uploaded_file):
+        st.error(
+            "The uploaded file is not a valid PDF. "
+            "Please upload a genuine PDF document."
+        )
+        st.stop()
+        
     with st.spinner("Reading your document..."):
 
         try:
