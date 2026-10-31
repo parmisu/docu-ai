@@ -598,36 +598,56 @@ if uploaded_file is not None:
 
     with st.spinner("Reading your document..."):
 
-        reader = PdfReader(uploaded_file)
+        try:
+            reader = PdfReader(uploaded_file)
 
-        page_documents = []
+            page_documents = []
 
-        for page_number, page in enumerate(
-            reader.pages,
-            start=1,
-        ):
+            for page_number, page in enumerate(
+                reader.pages,
+                start=1,
+            ):
 
-            page_text = page.extract_text()
+                try:
+                    page_text = page.extract_text()
 
-            if page_text:
-
-                page_documents.append(
-                    Document(
-                        page_content=page_text,
-                        metadata={
-                            "source": uploaded_file.name,
-                            "page": page_number,
-                        },
+                except Exception:
+                    st.error(
+                        "The PDF could not be read correctly. "
+                        "One or more pages may be corrupted or incomplete."
                     )
-                )
+                    st.stop()
 
-if not page_documents:
-    st.warning(
-        "No extractable text was found in this PDF. "
-        "The document may be empty, scanned, or image-only. "
-        "OCR is not currently supported."
-    )
-    st.stop()
+                if page_text:
+
+                    page_documents.append(
+                        Document(
+                            page_content=page_text,
+                            metadata={
+                                "source": uploaded_file.name,
+                                "page": page_number,
+                            },
+                        )
+                    )
+
+        except Exception:
+            st.error(
+                "This PDF could not be opened. "
+                "The file may be corrupted, incomplete, "
+                "or not a valid PDF."
+            )
+            st.stop()
+
+
+    if not page_documents:
+        st.warning(
+            "No extractable text was found in this PDF. "
+            "The document may be empty, scanned, or image-only. "
+            "OCR is not currently supported."
+        )
+        st.stop()
+
+
     # ----------------------------------------------
     # CHUNKING
     # ----------------------------------------------
@@ -642,8 +662,6 @@ if not page_documents:
         chunks = text_splitter.split_documents(
             page_documents
         )
-
-
     # ----------------------------------------------
     # DOCUMENT STATUS CARD
     # ----------------------------------------------
