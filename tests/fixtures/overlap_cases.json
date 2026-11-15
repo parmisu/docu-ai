@@ -1,0 +1,26 @@
+{
+    "chunk_size": 1000,
+    "chunk_overlap": 200,
+    "cases": [
+      {
+        "name": "short_text",
+        "length": 600,
+        "expected_chunks": 1
+      },
+      {
+        "name": "exact_chunk_size",
+        "length": 1000,
+        "expected_chunks": 1
+      },
+      {
+        "name": "slightly_over_chunk_size",
+        "length": 1100,
+        "expected_chunks": 2
+      },
+      {
+        "name": "long_text",
+        "length": 2600,
+        "expected_min_chunks": 3
+      }
+    ]
+  }
