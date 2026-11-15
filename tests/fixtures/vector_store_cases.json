@@ -1,0 +1,30 @@
+{
+    "storage_policy": {
+      "one_record_per_chunk": true,
+      "ids_must_be_unique": true,
+      "metadata_must_be_preserved": true,
+      "storage_errors_must_raise": true
+    },
+    "documents": [
+      {
+        "text": "VECTOR_MARKER_1 Python handles document processing.",
+        "source": "vector_fixture.pdf",
+        "page": 1
+      },
+      {
+        "text": "VECTOR_MARKER_2 Chroma stores vector representations.",
+        "source": "vector_fixture.pdf",
+        "page": 2
+      },
+      {
+        "text": "VECTOR_MARKER_3 Ollama generates local answers.",
+        "source": "vector_fixture.pdf",
+        "page": 3
+      },
+      {
+        "text": "VECTOR_MARKER_4 Streamlit provides the application interface.",
+        "source": "vector_fixture.pdf",
+        "page": 4
+      }
+    ]
+  }
