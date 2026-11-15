@@ -1,0 +1,4 @@
+test_id,document_type,file_name,file_size_bytes,file_size_mb,pages,chunks,metric,value_seconds,threshold_seconds,result,notes
+perf-001,controlled,large_sample.pdf,28114,0.027,50,,pdf_extraction,0.014055,10,PASS,"50 of 50 pages produced non-empty text"
+perf-002,real_world,O'Reilly_AI_Engineering_Building_Applications_with_Foundation_Models.pdf,,31.3,991,1639,document_preparation,15,,OBSERVED,"Reached Document ready without crash"
+perf-003,real_world,O'Reilly_AI_Engineering_Building_Applications_with_Foundation_Models.pdf,,31.3,991,1639,answer_generation,5,,OBSERVED,"Question: What is a foundation model? Model returned document-answer-not-found response"
