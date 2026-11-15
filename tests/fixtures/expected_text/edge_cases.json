@@ -1,0 +1,34 @@
+{
+    "cases": [
+      {
+        "name": "multiple_spaces",
+        "input": "Docu    AI     keeps   essential   words.",
+        "expected": "Docu AI keeps essential words."
+      },
+      {
+        "name": "tabs",
+        "input": "Docu\tAI\tuses\tlocal\tmodels.",
+        "expected": "Docu AI uses local models."
+      },
+      {
+        "name": "irregular_line_breaks",
+        "input": "Docu AI\n\n\nretrieves\ncontext.",
+        "expected": "Docu AI\n\nretrieves\ncontext."
+      },
+      {
+        "name": "surrounding_whitespace",
+        "input": "   Docu AI preserves content.   ",
+        "expected": "Docu AI preserves content."
+      },
+      {
+        "name": "replacement_character",
+        "input": "Docu AI uses the replacement \ufffd character.",
+        "expected": "Docu AI uses the replacement character."
+      },
+      {
+        "name": "punctuation_preserved",
+        "input": "Docu AI: RAG, ChromaDB, Ollama.",
+        "expected": "Docu AI: RAG, ChromaDB, Ollama."
+      }
+    ]
+  }

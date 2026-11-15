@@ -22,6 +22,7 @@ from langchain_chroma import Chroma
 from langchain_ollama import ChatOllama
 from langchain_core.documents import Document
 from pdf_validation import has_pdf_signature
+from text_cleaning import clean_extracted_text
 
 # ==================================================
 # PAGE CONFIG
@@ -615,7 +616,9 @@ if uploaded_file is not None:
             ):
 
                 try:
-                    page_text = page.extract_text()
+                    page_text = clean_extracted_text(
+    page.extract_text() or ""
+)
 
                 except Exception:
                     st.error(
