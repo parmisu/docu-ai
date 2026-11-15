@@ -1,0 +1,79 @@
+{
+    "policy": "Exact duplicate content is removed only when text, source, and page are all identical.",
+    "cases": [
+      {
+        "name": "exact_duplicate_same_page",
+        "documents": [
+          {
+            "text": "Repeated content from page one.",
+            "source": "document_a.pdf",
+            "page": 1
+          },
+          {
+            "text": "Repeated content from page one.",
+            "source": "document_a.pdf",
+            "page": 1
+          }
+        ],
+        "expected_count": 1
+      },
+      {
+        "name": "same_text_different_pages",
+        "documents": [
+          {
+            "text": "Shared paragraph text.",
+            "source": "document_a.pdf",
+            "page": 1
+          },
+          {
+            "text": "Shared paragraph text.",
+            "source": "document_a.pdf",
+            "page": 2
+          }
+        ],
+        "expected_count": 2
+      },
+      {
+        "name": "same_text_different_sources",
+        "documents": [
+          {
+            "text": "Identical content appears here.",
+            "source": "document_a.pdf",
+            "page": 1
+          },
+          {
+            "text": "Identical content appears here.",
+            "source": "document_b.pdf",
+            "page": 1
+          }
+        ],
+        "expected_count": 2
+      },
+      {
+        "name": "mixed_duplicates",
+        "documents": [
+          {
+            "text": "FIRST_MARKER Important content.",
+            "source": "document_a.pdf",
+            "page": 1
+          },
+          {
+            "text": "FIRST_MARKER Important content.",
+            "source": "document_a.pdf",
+            "page": 1
+          },
+          {
+            "text": "SECOND_MARKER Important content.",
+            "source": "document_a.pdf",
+            "page": 2
+          },
+          {
+            "text": "FIRST_MARKER Important content.",
+            "source": "document_b.pdf",
+            "page": 1
+          }
+        ],
+        "expected_count": 3
+      }
+    ]
+  }
