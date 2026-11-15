@@ -1,0 +1,56 @@
+{
+    "documents": [
+      {
+        "text": "PYTHON_MARKER Python is used for the document processing and application logic in Docu AI.",
+        "source": "retrieval_fixture.pdf",
+        "page": 1
+      },
+      {
+        "text": "CHROMA_MARKER ChromaDB stores vector embeddings and supports semantic similarity retrieval.",
+        "source": "retrieval_fixture.pdf",
+        "page": 2
+      },
+      {
+        "text": "OLLAMA_MARKER Ollama runs the local language model used to generate answers.",
+        "source": "retrieval_fixture.pdf",
+        "page": 3
+      },
+      {
+        "text": "STREAMLIT_MARKER Streamlit provides the user interface for uploading PDFs and asking questions.",
+        "source": "retrieval_fixture.pdf",
+        "page": 4
+      },
+      {
+        "text": "EMBEDDING_MARKER Sentence Transformers convert document chunks into vector embeddings.",
+        "source": "retrieval_fixture.pdf",
+        "page": 5
+      },
+      {
+        "text": "METADATA_MARKER Source names and page numbers are stored as metadata for traceability.",
+        "source": "retrieval_fixture.pdf",
+        "page": 6
+      }
+    ],
+    "queries": [
+      {
+        "question": "What stores vector embeddings for semantic retrieval?",
+        "expected_marker": "CHROMA_MARKER",
+        "expected_page": 2
+      },
+      {
+        "question": "What runs the local language model?",
+        "expected_marker": "OLLAMA_MARKER",
+        "expected_page": 3
+      },
+      {
+        "question": "What provides the application user interface?",
+        "expected_marker": "STREAMLIT_MARKER",
+        "expected_page": 4
+      },
+      {
+        "question": "What converts document chunks into vector embeddings?",
+        "expected_marker": "EMBEDDING_MARKER",
+        "expected_page": 5
+      }
+    ]
+  }
