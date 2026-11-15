@@ -1,0 +1,22 @@
+{
+    "chunk_size": 1000,
+    "chunk_overlap": 200,
+    "cases": [
+      {
+        "name": "shorter_than_chunk",
+        "length": 600
+      },
+      {
+        "name": "exact_chunk_size",
+        "length": 1000
+      },
+      {
+        "name": "slightly_over_chunk",
+        "length": 1100
+      },
+      {
+        "name": "very_long_text",
+        "length": 5000
+      }
+    ]
+  }
