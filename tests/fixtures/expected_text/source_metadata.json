@@ -1,0 +1,18 @@
+{
+    "page_numbering": "one-based",
+    "source": "source_metadata_fixture.pdf",
+    "pages": [
+      {
+        "page": 1,
+        "text": "PAGE_ONE_MARKER Python is used to build the document processing pipeline."
+      },
+      {
+        "page": 2,
+        "text": "PAGE_TWO_MARKER ChromaDB stores vector embeddings for semantic retrieval."
+      },
+      {
+        "page": 3,
+        "text": "PAGE_THREE_MARKER Ollama runs the local language model used for answering questions."
+      }
+    ]
+  }
