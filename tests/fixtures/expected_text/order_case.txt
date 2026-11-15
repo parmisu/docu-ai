@@ -1,0 +1,15 @@
+PARAGRAPH_1_SENTENCE_1 Docu AI processes uploaded documents.
+PARAGRAPH_1_SENTENCE_2 The extracted text is converted into structured document objects.
+PARAGRAPH_1_SENTENCE_3 Metadata such as page numbers remains attached to the content.
+
+PARAGRAPH_2_SENTENCE_1 The document text is divided into smaller chunks for retrieval.
+PARAGRAPH_2_SENTENCE_2 Adjacent chunks may intentionally share overlapping text.
+PARAGRAPH_2_SENTENCE_3 This overlap should not change the original order of the content.
+
+PARAGRAPH_3_SENTENCE_1 The embedding stage converts chunks into vector representations.
+PARAGRAPH_3_SENTENCE_2 Retrieval later selects chunks that are relevant to the user question.
+PARAGRAPH_3_SENTENCE_3 Source metadata is used to trace retrieved content back to the document.
+
+PARAGRAPH_4_SENTENCE_1 The language model receives retrieved context and the user question.
+PARAGRAPH_4_SENTENCE_2 The answer should remain grounded in the supplied document context.
+PARAGRAPH_4_SENTENCE_3 Original sentence order must not be lost during chunking.
