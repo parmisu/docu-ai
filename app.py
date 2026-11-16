@@ -7,14 +7,15 @@ def get_embeddings():
         model_name="sentence-transformers/all-MiniLM-L6-v2"
     )
 @st.cache_resource
-def get_vector_store(_documents):
+def get_vector_store(document_key, _documents):
     embeddings = get_embeddings()
 
     return Chroma.from_documents(
         documents=_documents,
-        embedding=embeddings
+        embedding=embeddings,
     )
-
+import hashlib
+from io import BytesIO
 from pypdf import PdfReader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
@@ -596,13 +597,19 @@ question = ""
 submitted = False
 
 if uploaded_file is not None:
+    uploaded_bytes = uploaded_file.getvalue()
+
+    document_key = hashlib.sha256(
+        uploaded_bytes
+    ).hexdigest()
+
     if not has_pdf_signature(uploaded_file):
         st.error(
             "The uploaded file is not a valid PDF. "
             "Please upload a genuine PDF document."
         )
         st.stop()
-        
+
     with st.spinner("Reading your document..."):
 
         try:
