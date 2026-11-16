@@ -1,0 +1,93 @@
+{
+    "documents": [
+      {
+        "text": "UPLOAD_MARKER Docu AI allows users to upload PDF documents through the Streamlit interface.",
+        "source": "multi_chunk_fixture.pdf",
+        "page": 1
+      },
+      {
+        "text": "EXTRACTION_MARKER PyPDF extracts text from each uploaded PDF page before further processing.",
+        "source": "multi_chunk_fixture.pdf",
+        "page": 2
+      },
+      {
+        "text": "EMBEDDING_MARKER Sentence Transformers convert document chunks into vector embeddings.",
+        "source": "multi_chunk_fixture.pdf",
+        "page": 3
+      },
+      {
+        "text": "STORAGE_MARKER ChromaDB stores the generated embeddings for semantic retrieval.",
+        "source": "multi_chunk_fixture.pdf",
+        "page": 4
+      },
+      {
+        "text": "RETRIEVAL_MARKER Similarity search retrieves document chunks that are relevant to the user question.",
+        "source": "multi_chunk_fixture.pdf",
+        "page": 5
+      },
+      {
+        "text": "GENERATION_MARKER Ollama uses the retrieved context to generate a local answer.",
+        "source": "multi_chunk_fixture.pdf",
+        "page": 6
+      },
+      {
+        "text": "SOURCE_MARKER Retrieved chunks retain source names and page numbers for traceability.",
+        "source": "multi_chunk_fixture.pdf",
+        "page": 7
+      }
+    ],
+    "queries": [
+      {
+        "question": "How does Docu AI accept a document and extract its text?",
+        "expected_sections": [
+          {
+            "marker": "UPLOAD_MARKER",
+            "page": 1
+          },
+          {
+            "marker": "EXTRACTION_MARKER",
+            "page": 2
+          }
+        ]
+      },
+      {
+        "question": "How are document chunks converted and stored for semantic search?",
+        "expected_sections": [
+          {
+            "marker": "EMBEDDING_MARKER",
+            "page": 3
+          },
+          {
+            "marker": "STORAGE_MARKER",
+            "page": 4
+          }
+        ]
+      },
+      {
+        "question": "How does Docu AI retrieve information and generate an answer?",
+        "expected_sections": [
+          {
+            "marker": "RETRIEVAL_MARKER",
+            "page": 5
+          },
+          {
+            "marker": "GENERATION_MARKER",
+            "page": 6
+          }
+        ]
+      },
+      {
+        "question": "How does retrieval work and how can retrieved information be traced back to the source?",
+        "expected_sections": [
+          {
+            "marker": "RETRIEVAL_MARKER",
+            "page": 5
+          },
+          {
+            "marker": "SOURCE_MARKER",
+            "page": 7
+          }
+        ]
+      }
+    ]
+  }

@@ -1,0 +1,9 @@
+question,expected_marker,expected_page,status,rank,retrieved_page,retrieved_source,score
+How does Docu AI accept a document and extract its text?,UPLOAD_MARKER,1,FOUND,1,1,multi_chunk_fixture.pdf,0.196289
+How does Docu AI accept a document and extract its text?,EXTRACTION_MARKER,2,FOUND,2,2,multi_chunk_fixture.pdf,0.117651
+How are document chunks converted and stored for semantic search?,EMBEDDING_MARKER,3,FOUND,3,3,multi_chunk_fixture.pdf,0.18998
+How are document chunks converted and stored for semantic search?,STORAGE_MARKER,4,FOUND,2,4,multi_chunk_fixture.pdf,0.27537
+How does Docu AI retrieve information and generate an answer?,RETRIEVAL_MARKER,5,FOUND,1,5,multi_chunk_fixture.pdf,0.210378
+How does Docu AI retrieve information and generate an answer?,GENERATION_MARKER,6,FOUND,2,6,multi_chunk_fixture.pdf,0.076913
+How does retrieval work and how can retrieved information be traced back to the source?,RETRIEVAL_MARKER,5,FOUND,1,5,multi_chunk_fixture.pdf,0.445861
+How does retrieval work and how can retrieved information be traced back to the source?,SOURCE_MARKER,7,FOUND,3,7,multi_chunk_fixture.pdf,0.149531
