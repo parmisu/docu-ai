@@ -1,0 +1,4 @@
+upload_number,document_key,input_chunk_count,stored_record_count,cache_hit,embedding_calls_this_upload,documents_embedded_this_upload
+1,dec5515f013afdc2634524cc85084d1346c1515c30d7398ef6c72e550ce715e6,1,1,False,1,1
+2,dec5515f013afdc2634524cc85084d1346c1515c30d7398ef6c72e550ce715e6,1,1,True,0,0
+3,dec5515f013afdc2634524cc85084d1346c1515c30d7398ef6c72e550ce715e6,1,1,True,0,0
