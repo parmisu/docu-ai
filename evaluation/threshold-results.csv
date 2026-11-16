@@ -1,0 +1,64 @@
+threshold,question,expected_type,expected_marker,best_score,expected_rank,expected_score,accepted_result_count,outcome
+0.0,What stores vector embeddings for semantic retrieval?,RELEVANT,CHROMA_MARKER,0.683912,1,0.683912,5,TRUE_POSITIVE
+0.0,What runs the local language model?,RELEVANT,OLLAMA_MARKER,0.51087,1,0.51087,2,TRUE_POSITIVE
+0.0,What provides the application user interface?,RELEVANT,STREAMLIT_MARKER,0.011785,1,0.011785,2,TRUE_POSITIVE
+0.0,What converts document chunks into vector embeddings?,RELEVANT,EMBEDDING_MARKER,0.636785,1,0.636785,4,TRUE_POSITIVE
+0.0,ChromaDB stores vector embeddings for semantic retrieval. What is its monthly price?,IRRELEVANT,,0.661953,,,3,FALSE_POSITIVE
+0.0,Who founded Streamlit?,IRRELEVANT,,0.040787,,,2,FALSE_POSITIVE
+0.0,What will the weather be tomorrow?,IRRELEVANT,,-0.303602,,,0,TRUE_NEGATIVE
+0.05,What stores vector embeddings for semantic retrieval?,RELEVANT,CHROMA_MARKER,0.683912,1,0.683912,3,TRUE_POSITIVE
+0.05,What runs the local language model?,RELEVANT,OLLAMA_MARKER,0.51087,1,0.51087,2,TRUE_POSITIVE
+0.05,What provides the application user interface?,RELEVANT,STREAMLIT_MARKER,0.011785,1,0.011785,0,FALSE_NEGATIVE
+0.05,What converts document chunks into vector embeddings?,RELEVANT,EMBEDDING_MARKER,0.636785,1,0.636785,3,TRUE_POSITIVE
+0.05,ChromaDB stores vector embeddings for semantic retrieval. What is its monthly price?,IRRELEVANT,,0.661953,,,3,FALSE_POSITIVE
+0.05,Who founded Streamlit?,IRRELEVANT,,0.040787,,,0,TRUE_NEGATIVE
+0.05,What will the weather be tomorrow?,IRRELEVANT,,-0.303602,,,0,TRUE_NEGATIVE
+0.1,What stores vector embeddings for semantic retrieval?,RELEVANT,CHROMA_MARKER,0.683912,1,0.683912,3,TRUE_POSITIVE
+0.1,What runs the local language model?,RELEVANT,OLLAMA_MARKER,0.51087,1,0.51087,2,TRUE_POSITIVE
+0.1,What provides the application user interface?,RELEVANT,STREAMLIT_MARKER,0.011785,1,0.011785,0,FALSE_NEGATIVE
+0.1,What converts document chunks into vector embeddings?,RELEVANT,EMBEDDING_MARKER,0.636785,1,0.636785,3,TRUE_POSITIVE
+0.1,ChromaDB stores vector embeddings for semantic retrieval. What is its monthly price?,IRRELEVANT,,0.661953,,,3,FALSE_POSITIVE
+0.1,Who founded Streamlit?,IRRELEVANT,,0.040787,,,0,TRUE_NEGATIVE
+0.1,What will the weather be tomorrow?,IRRELEVANT,,-0.303602,,,0,TRUE_NEGATIVE
+0.15,What stores vector embeddings for semantic retrieval?,RELEVANT,CHROMA_MARKER,0.683912,1,0.683912,3,TRUE_POSITIVE
+0.15,What runs the local language model?,RELEVANT,OLLAMA_MARKER,0.51087,1,0.51087,2,TRUE_POSITIVE
+0.15,What provides the application user interface?,RELEVANT,STREAMLIT_MARKER,0.011785,1,0.011785,0,FALSE_NEGATIVE
+0.15,What converts document chunks into vector embeddings?,RELEVANT,EMBEDDING_MARKER,0.636785,1,0.636785,3,TRUE_POSITIVE
+0.15,ChromaDB stores vector embeddings for semantic retrieval. What is its monthly price?,IRRELEVANT,,0.661953,,,3,FALSE_POSITIVE
+0.15,Who founded Streamlit?,IRRELEVANT,,0.040787,,,0,TRUE_NEGATIVE
+0.15,What will the weather be tomorrow?,IRRELEVANT,,-0.303602,,,0,TRUE_NEGATIVE
+0.2,What stores vector embeddings for semantic retrieval?,RELEVANT,CHROMA_MARKER,0.683912,1,0.683912,3,TRUE_POSITIVE
+0.2,What runs the local language model?,RELEVANT,OLLAMA_MARKER,0.51087,1,0.51087,2,TRUE_POSITIVE
+0.2,What provides the application user interface?,RELEVANT,STREAMLIT_MARKER,0.011785,1,0.011785,0,FALSE_NEGATIVE
+0.2,What converts document chunks into vector embeddings?,RELEVANT,EMBEDDING_MARKER,0.636785,1,0.636785,3,TRUE_POSITIVE
+0.2,ChromaDB stores vector embeddings for semantic retrieval. What is its monthly price?,IRRELEVANT,,0.661953,,,3,FALSE_POSITIVE
+0.2,Who founded Streamlit?,IRRELEVANT,,0.040787,,,0,TRUE_NEGATIVE
+0.2,What will the weather be tomorrow?,IRRELEVANT,,-0.303602,,,0,TRUE_NEGATIVE
+0.25,What stores vector embeddings for semantic retrieval?,RELEVANT,CHROMA_MARKER,0.683912,1,0.683912,3,TRUE_POSITIVE
+0.25,What runs the local language model?,RELEVANT,OLLAMA_MARKER,0.51087,1,0.51087,2,TRUE_POSITIVE
+0.25,What provides the application user interface?,RELEVANT,STREAMLIT_MARKER,0.011785,1,0.011785,0,FALSE_NEGATIVE
+0.25,What converts document chunks into vector embeddings?,RELEVANT,EMBEDDING_MARKER,0.636785,1,0.636785,2,TRUE_POSITIVE
+0.25,ChromaDB stores vector embeddings for semantic retrieval. What is its monthly price?,IRRELEVANT,,0.661953,,,3,FALSE_POSITIVE
+0.25,Who founded Streamlit?,IRRELEVANT,,0.040787,,,0,TRUE_NEGATIVE
+0.25,What will the weather be tomorrow?,IRRELEVANT,,-0.303602,,,0,TRUE_NEGATIVE
+0.3,What stores vector embeddings for semantic retrieval?,RELEVANT,CHROMA_MARKER,0.683912,1,0.683912,3,TRUE_POSITIVE
+0.3,What runs the local language model?,RELEVANT,OLLAMA_MARKER,0.51087,1,0.51087,2,TRUE_POSITIVE
+0.3,What provides the application user interface?,RELEVANT,STREAMLIT_MARKER,0.011785,1,0.011785,0,FALSE_NEGATIVE
+0.3,What converts document chunks into vector embeddings?,RELEVANT,EMBEDDING_MARKER,0.636785,1,0.636785,1,TRUE_POSITIVE
+0.3,ChromaDB stores vector embeddings for semantic retrieval. What is its monthly price?,IRRELEVANT,,0.661953,,,2,FALSE_POSITIVE
+0.3,Who founded Streamlit?,IRRELEVANT,,0.040787,,,0,TRUE_NEGATIVE
+0.3,What will the weather be tomorrow?,IRRELEVANT,,-0.303602,,,0,TRUE_NEGATIVE
+0.4,What stores vector embeddings for semantic retrieval?,RELEVANT,CHROMA_MARKER,0.683912,1,0.683912,2,TRUE_POSITIVE
+0.4,What runs the local language model?,RELEVANT,OLLAMA_MARKER,0.51087,1,0.51087,2,TRUE_POSITIVE
+0.4,What provides the application user interface?,RELEVANT,STREAMLIT_MARKER,0.011785,1,0.011785,0,FALSE_NEGATIVE
+0.4,What converts document chunks into vector embeddings?,RELEVANT,EMBEDDING_MARKER,0.636785,1,0.636785,1,TRUE_POSITIVE
+0.4,ChromaDB stores vector embeddings for semantic retrieval. What is its monthly price?,IRRELEVANT,,0.661953,,,2,FALSE_POSITIVE
+0.4,Who founded Streamlit?,IRRELEVANT,,0.040787,,,0,TRUE_NEGATIVE
+0.4,What will the weather be tomorrow?,IRRELEVANT,,-0.303602,,,0,TRUE_NEGATIVE
+0.5,What stores vector embeddings for semantic retrieval?,RELEVANT,CHROMA_MARKER,0.683912,1,0.683912,2,TRUE_POSITIVE
+0.5,What runs the local language model?,RELEVANT,OLLAMA_MARKER,0.51087,1,0.51087,2,TRUE_POSITIVE
+0.5,What provides the application user interface?,RELEVANT,STREAMLIT_MARKER,0.011785,1,0.011785,0,FALSE_NEGATIVE
+0.5,What converts document chunks into vector embeddings?,RELEVANT,EMBEDDING_MARKER,0.636785,1,0.636785,1,TRUE_POSITIVE
+0.5,ChromaDB stores vector embeddings for semantic retrieval. What is its monthly price?,IRRELEVANT,,0.661953,,,2,FALSE_POSITIVE
+0.5,Who founded Streamlit?,IRRELEVANT,,0.040787,,,0,TRUE_NEGATIVE
+0.5,What will the weather be tomorrow?,IRRELEVANT,,-0.303602,,,0,TRUE_NEGATIVE
