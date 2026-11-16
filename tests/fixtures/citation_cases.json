@@ -1,0 +1,76 @@
+{
+    "documents": [
+      {
+        "text": "CHROMA_CITATION ChromaDB stores vector embeddings for semantic retrieval.",
+        "source": "docu_ai_reference.pdf",
+        "page": 2
+      },
+      {
+        "text": "OLLAMA_CITATION Ollama runs the local language model used to generate answers.",
+        "source": "docu_ai_reference.pdf",
+        "page": 3
+      },
+      {
+        "text": "STREAMLIT_CITATION Streamlit provides the interface for uploading PDF files and asking questions.",
+        "source": "docu_ai_reference.pdf",
+        "page": 4
+      },
+      {
+        "text": "METADATA_CITATION Retrieved chunks retain source names and page numbers for traceability.",
+        "source": "docu_ai_reference.pdf",
+        "page": 5
+      },
+      {
+        "text": "DISTRACTOR This section discusses general application configuration.",
+        "source": "docu_ai_reference.pdf",
+        "page": 6
+      }
+    ],
+    "cases": [
+      {
+        "id": "citation-001",
+        "question": "What stores vector embeddings?",
+        "claim": "ChromaDB stores vector embeddings.",
+        "expected_source": "docu_ai_reference.pdf",
+        "expected_page": 2,
+        "required_evidence_terms": [
+          "chromadb",
+          "vector embeddings"
+        ]
+      },
+      {
+        "id": "citation-002",
+        "question": "What runs the local language model?",
+        "claim": "Ollama runs the local language model.",
+        "expected_source": "docu_ai_reference.pdf",
+        "expected_page": 3,
+        "required_evidence_terms": [
+          "ollama",
+          "local language model"
+        ]
+      },
+      {
+        "id": "citation-003",
+        "question": "What provides the PDF upload interface?",
+        "claim": "Streamlit provides the user interface.",
+        "expected_source": "docu_ai_reference.pdf",
+        "expected_page": 4,
+        "required_evidence_terms": [
+          "streamlit",
+          "interface"
+        ]
+      },
+      {
+        "id": "citation-004",
+        "question": "What metadata supports traceability?",
+        "claim": "Source names and page numbers support traceability.",
+        "expected_source": "docu_ai_reference.pdf",
+        "expected_page": 5,
+        "required_evidence_terms": [
+          "source names",
+          "page numbers",
+          "traceability"
+        ]
+      }
+    ]
+  }

@@ -1,0 +1,5 @@
+id,question,claim,expected_source,expected_page,citation_rank,actual_source,actual_page,source_correct,page_correct,evidence_supports_claim,score,overall_result
+citation-001,What stores vector embeddings?,ChromaDB stores vector embeddings.,docu_ai_reference.pdf,2,1,docu_ai_reference.pdf,2,True,True,True,0.337456,PASS
+citation-002,What runs the local language model?,Ollama runs the local language model.,docu_ai_reference.pdf,3,1,docu_ai_reference.pdf,3,True,True,True,0.432489,PASS
+citation-003,What provides the PDF upload interface?,Streamlit provides the user interface.,docu_ai_reference.pdf,4,1,docu_ai_reference.pdf,4,True,True,True,0.519953,PASS
+citation-004,What metadata supports traceability?,Source names and page numbers support traceability.,docu_ai_reference.pdf,5,1,docu_ai_reference.pdf,5,True,True,True,0.261516,PASS
