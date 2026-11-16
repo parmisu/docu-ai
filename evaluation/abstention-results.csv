@@ -1,0 +1,5 @@
+id,question,model_answer,abstained,unsupported_claim_detected,overall_result
+abstain-001,What is the monthly subscription price of Docu AI?,ANSWER CANNOT BE FOUND IN THE PROVIDED DOCUMENT.,True,False,PASS
+abstain-002,Who founded Docu AI?,ANSWER CANNOT BE FOUND IN THE PROVIDED DOCUMENT.,True,False,PASS
+abstain-003,In which country was Docu AI created?,ANSWER CANNOT BE FOUND IN THE PROVIDED DOCUMENT.,True,False,PASS
+abstain-004,What year was Docu AI first released?,ANSWER CANNOT BE FOUND IN THE PROVIDED DOCUMENT.,True,False,PASS

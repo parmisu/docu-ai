@@ -1,0 +1,38 @@
+{
+    "document_context": "Docu AI uses ChromaDB to store vector embeddings. Ollama runs the local language model. Streamlit provides the user interface. Retrieved chunks retain source names and page numbers for traceability.",
+    "cases": [
+      {
+        "id": "abstain-001",
+        "question": "What is the monthly subscription price of Docu AI?",
+        "unsupported_terms": [
+          "monthly price",
+          "subscription price",
+          "cost"
+        ]
+      },
+      {
+        "id": "abstain-002",
+        "question": "Who founded Docu AI?",
+        "unsupported_terms": [
+          "founder",
+          "founded by"
+        ]
+      },
+      {
+        "id": "abstain-003",
+        "question": "In which country was Docu AI created?",
+        "unsupported_terms": [
+          "country",
+          "created in"
+        ]
+      },
+      {
+        "id": "abstain-004",
+        "question": "What year was Docu AI first released?",
+        "unsupported_terms": [
+          "release year",
+          "released in"
+        ]
+      }
+    ]
+  }
