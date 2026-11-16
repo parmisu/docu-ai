@@ -1,0 +1,5 @@
+id,question,reference_answer,model_answer,required_facts_pass,forbidden_facts_pass,grounded,overall_result
+answer-001,What database stores vector embeddings in Docu AI?,ChromaDB stores the vector embeddings.,ChromaDB,True,True,True,PASS
+answer-002,Which tool runs the local language model?,Ollama runs the local language model.,Ollama.,True,True,True,PASS
+answer-003,What framework provides the user interface?,Streamlit provides the user interface.,Streamlit,True,True,True,PASS
+answer-004,What information is kept for source traceability?,The source document name and page number are retained for traceability.,Source document name and page number.,True,True,True,PASS
