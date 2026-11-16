@@ -1,0 +1,59 @@
+{
+    "relevance_threshold": 0.15,
+    "documents": [
+      {
+        "text": "PYTHON_MARKER Python handles document processing and application logic in Docu AI.",
+        "source": "irrelevant_fixture.pdf",
+        "page": 1
+      },
+      {
+        "text": "CHROMA_MARKER ChromaDB stores vector embeddings for semantic retrieval.",
+        "source": "irrelevant_fixture.pdf",
+        "page": 2
+      },
+      {
+        "text": "OLLAMA_MARKER Ollama runs the local language model used to generate answers.",
+        "source": "irrelevant_fixture.pdf",
+        "page": 3
+      },
+      {
+        "text": "STREAMLIT_MARKER Streamlit provides the interface for uploading PDFs and asking questions.",
+        "source": "irrelevant_fixture.pdf",
+        "page": 4
+      },
+      {
+        "text": "SOURCE_MARKER Retrieved chunks retain source names and page numbers for traceability.",
+        "source": "irrelevant_fixture.pdf",
+        "page": 5
+      }
+    ],
+    "questions": [
+      {
+        "question": "ChromaDB stores vector embeddings for semantic retrieval. What is its monthly price?",
+        "required_answer_terms": [
+          "price",
+          "cost",
+          "monthly fee"
+        ],
+        "expect_high_similarity_without_evidence": true
+      },
+      {
+        "question": "Who founded Streamlit?",
+        "required_answer_terms": [
+          "founder",
+          "founded by",
+          "created by"
+        ],
+        "expect_high_similarity_without_evidence": false
+      },
+      {
+        "question": "What will the weather be tomorrow?",
+        "required_answer_terms": [
+          "weather",
+          "temperature",
+          "rain"
+        ],
+        "expect_high_similarity_without_evidence": false
+      }
+    ]
+  }
