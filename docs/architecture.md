@@ -440,3 +440,39 @@ The current architecture is designed for:
 - single-turn document question answering
 
 The architecture described here reflects the current implementation and should be updated if the retrieval, storage, generation, or document-processing pipeline changes.
+
+## Vector Store Persistence
+
+Docu AI currently uses an in-memory Chroma vector store without a configured `persist_directory`.
+
+The storage lifecycle is therefore runtime-scoped.
+
+```text
+PDF upload
+→ extraction
+→ chunking
+→ embedding
+→ in-memory Chroma store
+```
+
+Within the same application runtime, the vector store may be reused through the document-content cache key.
+
+However, after the application process is terminated, the in-memory vector store is not persisted to disk.
+
+On a new application run, the document must therefore be processed and indexed again.
+
+Current behavior:
+
+```text
+same runtime + same PDF
+→ cached vector store may be reused
+
+application restart
+→ previous vector store is unavailable
+→ vector store is rebuilt
+→ document embeddings are recomputed
+```
+
+This is an intentional documented limitation of the current local-first implementation rather than an assumption of durable persistence.
+
+Future versions may introduce an explicit Chroma persistence directory if cross-session vector-store reuse becomes a requirement.
