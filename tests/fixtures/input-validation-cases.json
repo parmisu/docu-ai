@@ -1,0 +1,48 @@
+{
+    "max_question_length": 500,
+    "language_scope": "English",
+    "cases": [
+      {
+        "id": "empty",
+        "input": "",
+        "expected_valid": false,
+        "expected_error": "empty_input"
+      },
+      {
+        "id": "whitespace",
+        "input": "     ",
+        "expected_valid": false,
+        "expected_error": "empty_input"
+      },
+      {
+        "id": "single_character",
+        "input": "A",
+        "expected_valid": true,
+        "expected_error": null
+      },
+      {
+        "id": "normal_question",
+        "input": "What stores vector embeddings?",
+        "expected_valid": true,
+        "expected_error": null
+      },
+      {
+        "id": "exact_boundary",
+        "generated_length": 500,
+        "expected_valid": true,
+        "expected_error": null
+      },
+      {
+        "id": "over_boundary",
+        "generated_length": 501,
+        "expected_valid": false,
+        "expected_error": "too_long"
+      },
+      {
+        "id": "only_numbers",
+        "input": "123456",
+        "expected_valid": false,
+        "expected_error": "unsupported_language"
+      }
+    ]
+  }
