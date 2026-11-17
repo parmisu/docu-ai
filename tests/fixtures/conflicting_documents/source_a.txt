@@ -1,0 +1,2 @@
+SOURCE_A_MARKER
+According to Source A, the Nova protocol timeout is 30 seconds.
