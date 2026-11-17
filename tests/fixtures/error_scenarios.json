@@ -1,0 +1,22 @@
+{
+    "scenarios": [
+      {
+        "id": "ollama-connection-refused",
+        "exception_type": "ConnectionError",
+        "raw_error": "Connection refused: localhost:11434",
+        "expected_error_type": "connection_error"
+      },
+      {
+        "id": "ollama-timeout",
+        "exception_type": "TimeoutError",
+        "raw_error": "Request timed out while contacting Ollama",
+        "expected_error_type": "connection_error"
+      },
+      {
+        "id": "ollama-runtime-failure",
+        "exception_type": "RuntimeError",
+        "raw_error": "Internal Ollama runtime failure",
+        "expected_error_type": "connection_error"
+      }
+    ]
+  }
