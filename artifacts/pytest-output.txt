@@ -1,0 +1,314 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.11.17, pytest-9.1.1, pluggy-1.7.0 -- /Users/parmisu/docu-ai/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/parmisu/docu-ai
+configfile: pytest.ini
+testpaths: tests
+plugins: langsmith-0.14.4, anyio-4.15.1
+collecting ... collected 114 items
+
+tests/test_abstention.py::test_unanswerable_questions_trigger_abstention SKIPPED [  0%]
+tests/test_abstention.py::test_fixture_questions_are_not_supported_by_context SKIPPED [  1%]
+tests/test_answer_generation.py::test_generated_answers_match_reference_facts SKIPPED [  2%]
+tests/test_answer_generation.py::test_dataset_defines_semantic_acceptance_rules SKIPPED [  3%]
+tests/test_app_state.py::test_initial_state_is_empty PASSED              [  4%]
+tests/test_app_state.py::test_successful_upload_becomes_active PASSED    [  5%]
+tests/test_app_state.py::test_failed_new_upload_does_not_replace_previous_document PASSED [  6%]
+tests/test_app_state.py::test_failed_first_upload_does_not_create_ready_document PASSED [  7%]
+tests/test_app_state.py::test_retry_after_failure_can_succeed PASSED     [  7%]
+tests/test_app_state.py::test_rerun_preserves_valid_ready_state PASSED   [  8%]
+tests/test_app_state.py::test_processing_state_is_not_treated_as_ready PASSED [  9%]
+tests/test_app_state.py::test_clear_document_removes_active_state PASSED [ 10%]
+tests/test_chunk_order.py::test_original_marker_order_is_preserved PASSED [ 11%]
+tests/test_chunk_order.py::test_each_original_marker_remains_present PASSED [ 12%]
+tests/test_chunk_order.py::test_overlap_does_not_reverse_content_order PASSED [ 13%]
+tests/test_chunk_order.py::test_chunk_metadata_is_preserved PASSED       [ 14%]
+tests/test_chunk_overlap.py::test_declared_overlap_between_consecutive_chunks PASSED [ 14%]
+tests/test_chunk_overlap.py::test_short_text_does_not_create_extra_chunks PASSED [ 15%]
+tests/test_chunk_overlap.py::test_exact_boundary_does_not_create_extra_chunks PASSED [ 16%]
+tests/test_chunk_overlap.py::test_slightly_over_boundary_terminates_cleanly PASSED [ 17%]
+tests/test_chunk_overlap.py::test_all_overlap_cases_produce_reasonable_chunk_counts PASSED [ 18%]
+tests/test_chunking.py::test_chunking_boundary_cases PASSED              [ 19%]
+tests/test_chunking.py::test_short_text_stays_in_single_chunk PASSED     [ 20%]
+tests/test_chunking.py::test_exact_chunk_size_stays_in_single_chunk PASSED [ 21%]
+tests/test_chunking.py::test_slightly_over_chunk_size_splits PASSED      [ 21%]
+tests/test_chunking.py::test_very_long_text_produces_multiple_chunks PASSED [ 22%]
+tests/test_chunking.py::test_no_non_empty_content_is_lost PASSED         [ 23%]
+tests/test_chunking.py::test_metadata_is_preserved PASSED                [ 24%]
+tests/test_citations.py::test_citations_match_source_page_and_claim PASSED [ 25%]
+tests/test_citations.py::test_page_numbering_is_one_based PASSED         [ 26%]
+tests/test_citations.py::test_citation_requires_evidence_not_metadata_only PASSED [ 27%]
+tests/test_conflicting_evidence.py::test_both_conflicting_sources_are_retrieved SKIPPED [ 28%]
+tests/test_conflicting_evidence.py::test_model_reports_conflict_without_resolving_it SKIPPED [ 28%]
+tests/test_conflicting_evidence.py::test_fixture_contains_real_conflict SKIPPED [ 29%]
+tests/test_corrupted_pdf.py::test_corrupted_pdf_cannot_be_opened PASSED  [ 30%]
+tests/test_corrupted_pdf.py::test_corrupted_pdf_does_not_produce_pages PASSED [ 31%]
+tests/test_deduplication.py::test_exact_duplicate_same_page_is_removed PASSED [ 32%]
+tests/test_deduplication.py::test_same_text_on_different_pages_is_preserved PASSED [ 33%]
+tests/test_deduplication.py::test_same_text_from_different_sources_is_preserved PASSED [ 34%]
+tests/test_deduplication.py::test_mixed_duplicates_preserve_required_metadata PASSED [ 35%]
+tests/test_deduplication.py::test_deduplication_preserves_original_order PASSED [ 35%]
+tests/test_document_deletion.py::test_delete_clears_active_document PASSED [ 36%]
+tests/test_document_deletion.py::test_deleted_document_cannot_be_searched PASSED [ 37%]
+tests/test_document_deletion.py::test_delete_does_not_reactivate_previous_store PASSED [ 38%]
+tests/test_document_replacement.py::test_replacement_changes_active_document PASSED [ 39%]
+tests/test_document_replacement.py::test_old_document_is_not_retrievable_after_replacement PASSED [ 40%]
+tests/test_document_replacement.py::test_new_document_is_retrievable_after_replacement PASSED [ 41%]
+tests/test_duplicate_upload.py::test_same_pdf_produces_same_document_key PASSED [ 42%]
+tests/test_duplicate_upload.py::test_duplicate_upload_reuses_store_without_duplicate_records PASSED [ 42%]
+tests/test_duplicate_upload.py::test_embeddings_are_not_recomputed_for_duplicate_upload PASSED [ 43%]
+tests/test_empty_pdf.py::test_empty_pdf_has_no_extractable_text PASSED   [ 44%]
+tests/test_empty_pdf.py::test_image_only_pdf_has_no_extractable_text_without_ocr PASSED [ 45%]
+tests/test_extraction_edge_cases.py::test_extraction_edge_cases PASSED   [ 46%]
+tests/test_extraction_edge_cases.py::test_essential_content_is_preserved PASSED [ 47%]
+tests/test_file_validation.py::test_plain_text_file_is_rejected PASSED   [ 48%]
+tests/test_file_validation.py::test_fake_pdf_extension_is_not_enough PASSED [ 49%]
+tests/test_file_validation.py::test_real_pdf_signature_is_accepted PASSED [ 50%]
+tests/test_file_validation.py::test_validation_preserves_file_position PASSED [ 50%]
+tests/test_input_validation.py::test_fixture_matches_validation_policy PASSED [ 51%]
+tests/test_input_validation.py::test_empty_input_is_rejected PASSED      [ 52%]
+tests/test_input_validation.py::test_whitespace_only_input_is_rejected PASSED [ 53%]
+tests/test_input_validation.py::test_valid_question_is_trimmed PASSED    [ 54%]
+tests/test_input_validation.py::test_exact_length_boundary_is_allowed PASSED [ 55%]
+tests/test_input_validation.py::test_over_length_boundary_is_rejected PASSED [ 56%]
+tests/test_input_validation.py::test_invalid_input_does_not_call_model PASSED [ 57%]
+tests/test_input_validation.py::test_overlong_input_does_not_call_model PASSED [ 57%]
+tests/test_input_validation.py::test_valid_input_calls_model_once PASSED [ 58%]
+tests/test_input_validation.py::test_non_english_like_input_is_rejected PASSED [ 59%]
+tests/test_irrelevant_retrieval.py::test_fixture_contains_no_required_answer_evidence PASSED [ 60%]
+tests/test_irrelevant_retrieval.py::test_irrelevant_retrieval_is_not_valid_evidence PASSED [ 61%]
+tests/test_irrelevant_retrieval.py::test_retrieved_results_remain_inspectable PASSED [ 62%]
+tests/test_large_pdf.py::test_large_pdf_page_count PASSED                [ 63%]
+tests/test_large_pdf.py::test_large_pdf_text_extraction_performance PASSED [ 64%]
+tests/test_large_pdf.py::test_large_pdf_preserves_page_markers PASSED    [ 64%]
+tests/test_multi_chunk_retrieval.py::test_multi_chunk_information_is_retrieved PASSED [ 65%]
+tests/test_multi_chunk_retrieval.py::test_each_question_requires_multiple_sections PASSED [ 66%]
+tests/test_multi_source_citations.py::test_each_claim_has_supporting_citation PASSED [ 67%]
+tests/test_multi_source_citations.py::test_each_case_requires_multiple_claims PASSED [ 68%]
+tests/test_multi_source_citations.py::test_missing_claim_is_detected_explicitly PASSED [ 69%]
+tests/test_ollama_connection_errors.py::test_connection_failures_are_handled FAILED [ 70%]
+tests/test_ollama_connection_errors.py::test_raw_exception_is_not_exposed_to_user PASSED [ 71%]
+tests/test_ollama_connection_errors.py::test_failure_does_not_leave_answer_content FAILED [ 71%]
+tests/test_ollama_connection_errors.py::test_success_state_remains_valid PASSED [ 72%]
+tests/test_ollama_connection_errors.py::test_fixture_defines_failure_scenarios PASSED [ 73%]
+tests/test_ollama_errors.py::test_missing_model_is_explained PASSED      [ 74%]
+tests/test_ollama_errors.py::test_timeout_explains_next_action PASSED    [ 75%]
+tests/test_ollama_errors.py::test_invalid_none_response_is_rejected PASSED [ 76%]
+tests/test_ollama_errors.py::test_empty_response_is_rejected PASSED      [ 77%]
+tests/test_ollama_errors.py::test_service_error_is_controlled PASSED     [ 78%]
+tests/test_ollama_errors.py::test_connection_error_remains_controlled PASSED [ 78%]
+tests/test_ollama_errors.py::test_failure_never_becomes_valid_answer PASSED [ 79%]
+tests/test_pdf_extraction.py::test_single_page_pdf_extraction_matches_expected_text PASSED [ 80%]
+tests/test_pdf_pages.py::test_multi_page_pdf_preserves_page_order_and_boundaries PASSED [ 81%]
+tests/test_pdf_pages.py::test_page_numbers_remain_traceable PASSED       [ 82%]
+tests/test_retrieval.py::test_expected_reference_is_in_top_five PASSED   [ 83%]
+tests/test_retrieval.py::test_top_five_results_are_inspectable PASSED    [ 84%]
+tests/test_source_metadata.py::test_page_numbering_contract_is_one_based PASSED [ 85%]
+tests/test_source_metadata.py::test_metadata_survives_chunking PASSED    [ 85%]
+tests/test_source_metadata.py::test_vector_store_retrieval_preserves_source_metadata PASSED [ 86%]
+tests/test_source_metadata.py::test_each_retrieved_page_matches_real_source_page PASSED [ 87%]
+tests/test_vector_store.py::test_input_chunk_count_matches_fixture PASSED [ 88%]
+tests/test_vector_store.py::test_vector_store_returns_one_id_per_chunk PASSED [ 89%]
+tests/test_vector_store.py::test_stored_record_count_matches_input_count PASSED [ 90%]
+tests/test_vector_store.py::test_stored_content_and_metadata_are_preserved PASSED [ 91%]
+tests/test_vector_store.py::test_stored_ids_are_unique PASSED            [ 92%]
+tests/test_vector_store.py::test_storage_error_is_not_silently_ignored PASSED [ 92%]
+tests/test_vector_store_isolation.py::test_fixture_documents_are_unique PASSED [ 93%]
+tests/test_vector_store_isolation.py::test_replacing_document_changes_cache_key PASSED [ 94%]
+tests/test_vector_store_isolation.py::test_document_b_retrieval_does_not_return_a PASSED [ 95%]
+tests/test_vector_store_isolation.py::test_old_document_information_is_not_present_after_replacement PASSED [ 96%]
+tests/test_vector_store_isolation.py::test_question_about_a_is_not_supported_by_b_store PASSED [ 97%]
+tests/test_vector_store_persistence.py::test_first_process_can_store_record PASSED [ 98%]
+tests/test_vector_store_persistence.py::test_new_process_does_not_recover_previous_store PASSED [ 99%]
+tests/test_vector_store_persistence.py::test_current_app_has_no_persistent_directory PASSED [100%]
+
+=================================== FAILURES ===================================
+_____________________ test_connection_failures_are_handled _____________________
+
+    def test_connection_failures_are_handled():
+        fixture = load_fixture()
+    
+        for scenario in fixture[
+            "scenarios"
+        ]:
+            exception = build_exception(
+                scenario[
+                    "exception_type"
+                ],
+                scenario[
+                    "raw_error"
+                ],
+            )
+    
+            model = FailingModel(
+                exception
+            )
+    
+            result = (
+                invoke_ollama_safely(
+                    model,
+                    ["test message"],
+                )
+            )
+    
+            assert result["ok"] is False
+    
+            assert (
+                result["content"]
+                is None
+            )
+    
+>           assert (
+                result["error_type"]
+                == scenario[
+                    "expected_error_type"
+                ]
+            )
+E           AssertionError: assert 'timeout' == 'connection_error'
+E             
+E             - connection_error
+E             + timeout
+
+tests/test_ollama_connection_errors.py:114: AssertionError
+__________________ test_failure_does_not_leave_answer_content __________________
+
+    def test_failure_does_not_leave_answer_content():
+        model = FailingModel(
+            ConnectionError(
+                "Connection refused"
+            )
+        )
+    
+        result = (
+            invoke_ollama_safely(
+                model,
+                ["question"],
+            )
+        )
+    
+>       assert result == {
+            "ok": False,
+            "content": None,
+            "user_message": (
+                "The local AI model is currently "
+                "unavailable. Please make sure Ollama "
+                "is running and try again."
+            ),
+            "error_type": (
+                "connection_error"
+            ),
+        }
+E       AssertionError: assert {'ok': False,...ection_error'} == {'ok': False,...ection_error'}
+E         
+E         Omitting 3 identical items, use -vv to show
+E         Differing items:
+E         {'user_message': 'Ollama could not be reached. Make sure the Ollama service is running and try again.'} != {'user_message': 'The local AI model is currently unavailable. Please make sure Ollama is running and try again.'}
+E         
+E         Full diff:
+E           {...
+E         
+E         ...Full output truncated (8 lines hidden), use '-vv' to show
+
+tests/test_ollama_connection_errors.py:184: AssertionError
+=============================== warnings summary ===============================
+tests/test_citations.py::test_citations_match_source_page_and_claim
+  /Users/parmisu/docu-ai/tests/test_citations.py:161: UserWarning: Relevance scores must be between 0 and 1, got [(Document(id='c7132834-b45a-4a20-b49d-2e2e5397027e', metadata={'source': 'docu_ai_reference.pdf', 'page': 2}, page_content='CHROMA_CITATION ChromaDB stores vector embeddings for semantic retrieval.'), 0.33745634614947606), (Document(id='c438ff8e-b9c1-4d2a-875f-55417d7f641f', metadata={'page': 3, 'source': 'docu_ai_reference.pdf'}, page_content='OLLAMA_CITATION Ollama runs the local language model used to generate answers.'), -0.21466753793062976), (Document(id='b0043740-e7c3-4489-94ea-ed38bedd7e5b', metadata={'source': 'docu_ai_reference.pdf', 'page': 6}, page_content='DISTRACTOR This section discusses general application configuration.'), -0.27148022531785965), (Document(id='e9d41056-31d4-4460-a844-32475a6fa2ef', metadata={'source': 'docu_ai_reference.pdf', 'page': 4}, page_content='STREAMLIT_CITATION Streamlit provides the interface for uploading PDF files and asking questions.'), -0.299407148609663), (Document(id='207cffbe-c63f-4ce7-991b-dcba85b30c0f', metadata={'page': 5, 'source': 'docu_ai_reference.pdf'}, page_content='METADATA_CITATION Retrieved chunks retain source names and page numbers for traceability.'), -0.3002913051977245)]
+    .similarity_search_with_relevance_scores(
+
+tests/test_citations.py::test_citations_match_source_page_and_claim
+  /Users/parmisu/docu-ai/tests/test_citations.py:161: UserWarning: Relevance scores must be between 0 and 1, got [(Document(id='c438ff8e-b9c1-4d2a-875f-55417d7f641f', metadata={'page': 3, 'source': 'docu_ai_reference.pdf'}, page_content='OLLAMA_CITATION Ollama runs the local language model used to generate answers.'), 0.43248906017183997), (Document(id='b0043740-e7c3-4489-94ea-ed38bedd7e5b', metadata={'page': 6, 'source': 'docu_ai_reference.pdf'}, page_content='DISTRACTOR This section discusses general application configuration.'), -0.07628535722196195), (Document(id='c7132834-b45a-4a20-b49d-2e2e5397027e', metadata={'source': 'docu_ai_reference.pdf', 'page': 2}, page_content='CHROMA_CITATION ChromaDB stores vector embeddings for semantic retrieval.'), -0.27517330077177804), (Document(id='207cffbe-c63f-4ce7-991b-dcba85b30c0f', metadata={'page': 5, 'source': 'docu_ai_reference.pdf'}, page_content='METADATA_CITATION Retrieved chunks retain source names and page numbers for traceability.'), -0.298246761576461), (Document(id='e9d41056-31d4-4460-a844-32475a6fa2ef', metadata={'page': 4, 'source': 'docu_ai_reference.pdf'}, page_content='STREAMLIT_CITATION Streamlit provides the interface for uploading PDF files and asking questions.'), -0.361509518366101)]
+    .similarity_search_with_relevance_scores(
+
+tests/test_citations.py::test_citations_match_source_page_and_claim
+  /Users/parmisu/docu-ai/tests/test_citations.py:161: UserWarning: Relevance scores must be between 0 and 1, got [(Document(id='e9d41056-31d4-4460-a844-32475a6fa2ef', metadata={'page': 4, 'source': 'docu_ai_reference.pdf'}, page_content='STREAMLIT_CITATION Streamlit provides the interface for uploading PDF files and asking questions.'), 0.5199527902575264), (Document(id='b0043740-e7c3-4489-94ea-ed38bedd7e5b', metadata={'page': 6, 'source': 'docu_ai_reference.pdf'}, page_content='DISTRACTOR This section discusses general application configuration.'), 0.05552806855888892), (Document(id='c438ff8e-b9c1-4d2a-875f-55417d7f641f', metadata={'source': 'docu_ai_reference.pdf', 'page': 3}, page_content='OLLAMA_CITATION Ollama runs the local language model used to generate answers.'), -0.24290980394299178), (Document(id='c7132834-b45a-4a20-b49d-2e2e5397027e', metadata={'page': 2, 'source': 'docu_ai_reference.pdf'}, page_content='CHROMA_CITATION ChromaDB stores vector embeddings for semantic retrieval.'), -0.30398210472182363), (Document(id='207cffbe-c63f-4ce7-991b-dcba85b30c0f', metadata={'source': 'docu_ai_reference.pdf', 'page': 5}, page_content='METADATA_CITATION Retrieved chunks retain source names and page numbers for traceability.'), -0.36967319433526735)]
+    .similarity_search_with_relevance_scores(
+
+tests/test_citations.py::test_citations_match_source_page_and_claim
+  /Users/parmisu/docu-ai/tests/test_citations.py:161: UserWarning: Relevance scores must be between 0 and 1, got [(Document(id='207cffbe-c63f-4ce7-991b-dcba85b30c0f', metadata={'page': 5, 'source': 'docu_ai_reference.pdf'}, page_content='METADATA_CITATION Retrieved chunks retain source names and page numbers for traceability.'), 0.26151607020885026), (Document(id='b0043740-e7c3-4489-94ea-ed38bedd7e5b', metadata={'page': 6, 'source': 'docu_ai_reference.pdf'}, page_content='DISTRACTOR This section discusses general application configuration.'), -0.14257703942668587), (Document(id='c438ff8e-b9c1-4d2a-875f-55417d7f641f', metadata={'page': 3, 'source': 'docu_ai_reference.pdf'}, page_content='OLLAMA_CITATION Ollama runs the local language model used to generate answers.'), -0.1564169686596022), (Document(id='e9d41056-31d4-4460-a844-32475a6fa2ef', metadata={'page': 4, 'source': 'docu_ai_reference.pdf'}, page_content='STREAMLIT_CITATION Streamlit provides the interface for uploading PDF files and asking questions.'), -0.17192869478555162), (Document(id='c7132834-b45a-4a20-b49d-2e2e5397027e', metadata={'page': 2, 'source': 'docu_ai_reference.pdf'}, page_content='CHROMA_CITATION ChromaDB stores vector embeddings for semantic retrieval.'), -0.18736354505981723)]
+    .similarity_search_with_relevance_scores(
+
+tests/test_irrelevant_retrieval.py::test_irrelevant_retrieval_is_not_valid_evidence
+  /Users/parmisu/docu-ai/tests/test_irrelevant_retrieval.py:197: UserWarning: Relevance scores must be between 0 and 1, got [(Document(id='99711927-9e50-464e-abce-d8408194a6f8', metadata={'page': 2, 'source': 'irrelevant_fixture.pdf'}, page_content='CHROMA_MARKER ChromaDB stores vector embeddings for semantic retrieval.'), 0.6619530882500361), (Document(id='e403f315-afbc-4e52-9f1b-bfd1aae3a274', metadata={'source': 'irrelevant_fixture.pdf', 'page': 3}, page_content='OLLAMA_MARKER Ollama runs the local language model used to generate answers.'), -0.008518451025659735), (Document(id='8fcfadf2-e087-4650-91c3-1191c04774d1', metadata={'source': 'irrelevant_fixture.pdf', 'page': 5}, page_content='SOURCE_MARKER Retrieved chunks retain source names and page numbers for traceability.'), -0.10112569820991868), (Document(id='cd2ea474-bf4d-4c80-8d11-44c6c8cabad4', metadata={'source': 'irrelevant_fixture.pdf', 'page': 1}, page_content='PYTHON_MARKER Python handles document processing and application logic in Docu AI.'), -0.12308791520676343), (Document(id='5cbe06c3-dd79-4125-9b13-7220c3a9c6cd', metadata={'source': 'irrelevant_fixture.pdf', 'page': 4}, page_content='STREAMLIT_MARKER Streamlit provides the interface for uploading PDFs and asking questions.'), -0.19658038647957365)]
+    .similarity_search_with_relevance_scores(
+
+tests/test_irrelevant_retrieval.py::test_irrelevant_retrieval_is_not_valid_evidence
+  /Users/parmisu/docu-ai/tests/test_irrelevant_retrieval.py:197: UserWarning: Relevance scores must be between 0 and 1, got [(Document(id='5cbe06c3-dd79-4125-9b13-7220c3a9c6cd', metadata={'page': 4, 'source': 'irrelevant_fixture.pdf'}, page_content='STREAMLIT_MARKER Streamlit provides the interface for uploading PDFs and asking questions.'), 0.004074352959819283), (Document(id='8fcfadf2-e087-4650-91c3-1191c04774d1', metadata={'page': 5, 'source': 'irrelevant_fixture.pdf'}, page_content='SOURCE_MARKER Retrieved chunks retain source names and page numbers for traceability.'), -0.2728618833057437), (Document(id='e403f315-afbc-4e52-9f1b-bfd1aae3a274', metadata={'page': 3, 'source': 'irrelevant_fixture.pdf'}, page_content='OLLAMA_MARKER Ollama runs the local language model used to generate answers.'), -0.3429899402493233), (Document(id='cd2ea474-bf4d-4c80-8d11-44c6c8cabad4', metadata={'page': 1, 'source': 'irrelevant_fixture.pdf'}, page_content='PYTHON_MARKER Python handles document processing and application logic in Docu AI.'), -0.4381978165740983), (Document(id='99711927-9e50-464e-abce-d8408194a6f8', metadata={'page': 2, 'source': 'irrelevant_fixture.pdf'}, page_content='CHROMA_MARKER ChromaDB stores vector embeddings for semantic retrieval.'), -0.46004741719172193)]
+    .similarity_search_with_relevance_scores(
+
+tests/test_irrelevant_retrieval.py::test_irrelevant_retrieval_is_not_valid_evidence
+  /Users/parmisu/docu-ai/tests/test_irrelevant_retrieval.py:197: UserWarning: Relevance scores must be between 0 and 1, got [(Document(id='e403f315-afbc-4e52-9f1b-bfd1aae3a274', metadata={'page': 3, 'source': 'irrelevant_fixture.pdf'}, page_content='OLLAMA_MARKER Ollama runs the local language model used to generate answers.'), -0.30360227732304335), (Document(id='5cbe06c3-dd79-4125-9b13-7220c3a9c6cd', metadata={'source': 'irrelevant_fixture.pdf', 'page': 4}, page_content='STREAMLIT_MARKER Streamlit provides the interface for uploading PDFs and asking questions.'), -0.3771379069687286), (Document(id='cd2ea474-bf4d-4c80-8d11-44c6c8cabad4', metadata={'page': 1, 'source': 'irrelevant_fixture.pdf'}, page_content='PYTHON_MARKER Python handles document processing and application logic in Docu AI.'), -0.43110500773189697), (Document(id='99711927-9e50-464e-abce-d8408194a6f8', metadata={'page': 2, 'source': 'irrelevant_fixture.pdf'}, page_content='CHROMA_MARKER ChromaDB stores vector embeddings for semantic retrieval.'), -0.4393077959764813), (Document(id='8fcfadf2-e087-4650-91c3-1191c04774d1', metadata={'source': 'irrelevant_fixture.pdf', 'page': 5}, page_content='SOURCE_MARKER Retrieved chunks retain source names and page numbers for traceability.'), -0.46827515637062467)]
+    .similarity_search_with_relevance_scores(
+
+tests/test_irrelevant_retrieval.py::test_retrieved_results_remain_inspectable
+  /Users/parmisu/docu-ai/tests/test_irrelevant_retrieval.py:295: UserWarning: Relevance scores must be between 0 and 1, got [(Document(id='e3da9dc6-8873-426a-8213-5a4ce8853ee5', metadata={'page': 2, 'source': 'irrelevant_fixture.pdf'}, page_content='CHROMA_MARKER ChromaDB stores vector embeddings for semantic retrieval.'), 0.6619530882500361), (Document(id='716e093c-5744-4f30-861e-8520d58db7c9', metadata={'page': 3, 'source': 'irrelevant_fixture.pdf'}, page_content='OLLAMA_MARKER Ollama runs the local language model used to generate answers.'), -0.008518451025659735), (Document(id='91b5369b-87f6-4366-804b-641c90d52052', metadata={'page': 5, 'source': 'irrelevant_fixture.pdf'}, page_content='SOURCE_MARKER Retrieved chunks retain source names and page numbers for traceability.'), -0.10112569820991868), (Document(id='7e649408-4430-4019-9f78-b54da35bf864', metadata={'page': 1, 'source': 'irrelevant_fixture.pdf'}, page_content='PYTHON_MARKER Python handles document processing and application logic in Docu AI.'), -0.12308791520676343), (Document(id='cd7f3ea3-6133-4025-8efe-54793fb5d74e', metadata={'source': 'irrelevant_fixture.pdf', 'page': 4}, page_content='STREAMLIT_MARKER Streamlit provides the interface for uploading PDFs and asking questions.'), -0.19658038647957365)]
+    .similarity_search_with_relevance_scores(
+
+tests/test_irrelevant_retrieval.py::test_retrieved_results_remain_inspectable
+  /Users/parmisu/docu-ai/tests/test_irrelevant_retrieval.py:295: UserWarning: Relevance scores must be between 0 and 1, got [(Document(id='cd7f3ea3-6133-4025-8efe-54793fb5d74e', metadata={'page': 4, 'source': 'irrelevant_fixture.pdf'}, page_content='STREAMLIT_MARKER Streamlit provides the interface for uploading PDFs and asking questions.'), 0.004074352959819283), (Document(id='91b5369b-87f6-4366-804b-641c90d52052', metadata={'source': 'irrelevant_fixture.pdf', 'page': 5}, page_content='SOURCE_MARKER Retrieved chunks retain source names and page numbers for traceability.'), -0.2728618833057437), (Document(id='716e093c-5744-4f30-861e-8520d58db7c9', metadata={'source': 'irrelevant_fixture.pdf', 'page': 3}, page_content='OLLAMA_MARKER Ollama runs the local language model used to generate answers.'), -0.3429899402493233), (Document(id='7e649408-4430-4019-9f78-b54da35bf864', metadata={'page': 1, 'source': 'irrelevant_fixture.pdf'}, page_content='PYTHON_MARKER Python handles document processing and application logic in Docu AI.'), -0.4381978165740983), (Document(id='e3da9dc6-8873-426a-8213-5a4ce8853ee5', metadata={'source': 'irrelevant_fixture.pdf', 'page': 2}, page_content='CHROMA_MARKER ChromaDB stores vector embeddings for semantic retrieval.'), -0.46004741719172193)]
+    .similarity_search_with_relevance_scores(
+
+tests/test_irrelevant_retrieval.py::test_retrieved_results_remain_inspectable
+  /Users/parmisu/docu-ai/tests/test_irrelevant_retrieval.py:295: UserWarning: Relevance scores must be between 0 and 1, got [(Document(id='716e093c-5744-4f30-861e-8520d58db7c9', metadata={'page': 3, 'source': 'irrelevant_fixture.pdf'}, page_content='OLLAMA_MARKER Ollama runs the local language model used to generate answers.'), -0.30360227732304335), (Document(id='cd7f3ea3-6133-4025-8efe-54793fb5d74e', metadata={'page': 4, 'source': 'irrelevant_fixture.pdf'}, page_content='STREAMLIT_MARKER Streamlit provides the interface for uploading PDFs and asking questions.'), -0.3771379069687286), (Document(id='7e649408-4430-4019-9f78-b54da35bf864', metadata={'source': 'irrelevant_fixture.pdf', 'page': 1}, page_content='PYTHON_MARKER Python handles document processing and application logic in Docu AI.'), -0.43110500773189697), (Document(id='e3da9dc6-8873-426a-8213-5a4ce8853ee5', metadata={'source': 'irrelevant_fixture.pdf', 'page': 2}, page_content='CHROMA_MARKER ChromaDB stores vector embeddings for semantic retrieval.'), -0.4393077959764813), (Document(id='91b5369b-87f6-4366-804b-641c90d52052', metadata={'page': 5, 'source': 'irrelevant_fixture.pdf'}, page_content='SOURCE_MARKER Retrieved chunks retain source names and page numbers for traceability.'), -0.46827515637062467)]
+    .similarity_search_with_relevance_scores(
+
+tests/test_multi_chunk_retrieval.py::test_multi_chunk_information_is_retrieved
+  /Users/parmisu/docu-ai/tests/test_multi_chunk_retrieval.py:118: UserWarning: Relevance scores must be between 0 and 1, got [(Document(id='70b297ad-f30c-4e72-a46e-1d197eb9f558', metadata={'source': 'multi_chunk_fixture.pdf', 'page': 1}, page_content='UPLOAD_MARKER Docu AI allows users to upload PDF documents through the Streamlit interface.'), 0.1962894388659966), (Document(id='4e0563d0-5526-4f6d-843a-73872fdbb668', metadata={'source': 'multi_chunk_fixture.pdf', 'page': 2}, page_content='EXTRACTION_MARKER PyPDF extracts text from each uploaded PDF page before further processing.'), 0.11765066880261221), (Document(id='8fbe661c-eb72-4292-b816-b8e3ab0db735', metadata={'page': 5, 'source': 'multi_chunk_fixture.pdf'}, page_content='RETRIEVAL_MARKER Similarity search retrieves document chunks that are relevant to the user question.'), 0.10088861426873863), (Document(id='a6b0996c-c590-4ea5-8c2f-2979cfc280ff', metadata={'source': 'multi_chunk_fixture.pdf', 'page': 3}, page_content='EMBEDDING_MARKER Sentence Transformers convert document chunks into vector embeddings.'), 0.06823315174880085), (Document(id='308d82de-d35e-41f2-8520-417d7e5fc955', metadata={'source': 'multi_chunk_fixture.pdf', 'page': 4}, page_content='STORAGE_MARKER ChromaDB stores the generated embeddings for semantic retrieval.'), -0.1252532516958591)]
+    .similarity_search_with_relevance_scores(
+
+tests/test_multi_chunk_retrieval.py::test_multi_chunk_information_is_retrieved
+  /Users/parmisu/docu-ai/tests/test_multi_chunk_retrieval.py:118: UserWarning: Relevance scores must be between 0 and 1, got [(Document(id='8fbe661c-eb72-4292-b816-b8e3ab0db735', metadata={'source': 'multi_chunk_fixture.pdf', 'page': 5}, page_content='RETRIEVAL_MARKER Similarity search retrieves document chunks that are relevant to the user question.'), 0.2103777816240361), (Document(id='69a4771f-6a3f-4853-b9df-2fefac9d802d', metadata={'page': 6, 'source': 'multi_chunk_fixture.pdf'}, page_content='GENERATION_MARKER Ollama uses the retrieved context to generate a local answer.'), 0.07691304231852847), (Document(id='70b297ad-f30c-4e72-a46e-1d197eb9f558', metadata={'page': 1, 'source': 'multi_chunk_fixture.pdf'}, page_content='UPLOAD_MARKER Docu AI allows users to upload PDF documents through the Streamlit interface.'), 0.060580295583586796), (Document(id='308d82de-d35e-41f2-8520-417d7e5fc955', metadata={'page': 4, 'source': 'multi_chunk_fixture.pdf'}, page_content='STORAGE_MARKER ChromaDB stores the generated embeddings for semantic retrieval.'), -0.026464073359416362), (Document(id='a6b0996c-c590-4ea5-8c2f-2979cfc280ff', metadata={'page': 3, 'source': 'multi_chunk_fixture.pdf'}, page_content='EMBEDDING_MARKER Sentence Transformers convert document chunks into vector embeddings.'), -0.057081061404276046)]
+    .similarity_search_with_relevance_scores(
+
+tests/test_multi_chunk_retrieval.py::test_multi_chunk_information_is_retrieved
+  /Users/parmisu/docu-ai/tests/test_multi_chunk_retrieval.py:118: UserWarning: Relevance scores must be between 0 and 1, got [(Document(id='8fbe661c-eb72-4292-b816-b8e3ab0db735', metadata={'page': 5, 'source': 'multi_chunk_fixture.pdf'}, page_content='RETRIEVAL_MARKER Similarity search retrieves document chunks that are relevant to the user question.'), 0.44586124367998237), (Document(id='308d82de-d35e-41f2-8520-417d7e5fc955', metadata={'page': 4, 'source': 'multi_chunk_fixture.pdf'}, page_content='STORAGE_MARKER ChromaDB stores the generated embeddings for semantic retrieval.'), 0.1774636217479385), (Document(id='8e8cb868-bed7-485d-bb3a-c8cb2788a849', metadata={'source': 'multi_chunk_fixture.pdf', 'page': 7}, page_content='SOURCE_MARKER Retrieved chunks retain source names and page numbers for traceability.'), 0.14953071360364645), (Document(id='69a4771f-6a3f-4853-b9df-2fefac9d802d', metadata={'source': 'multi_chunk_fixture.pdf', 'page': 6}, page_content='GENERATION_MARKER Ollama uses the retrieved context to generate a local answer.'), -0.044043018111127985), (Document(id='4e0563d0-5526-4f6d-843a-73872fdbb668', metadata={'page': 2, 'source': 'multi_chunk_fixture.pdf'}, page_content='EXTRACTION_MARKER PyPDF extracts text from each uploaded PDF page before further processing.'), -0.09452600749529472)]
+    .similarity_search_with_relevance_scores(
+
+tests/test_multi_source_citations.py::test_each_claim_has_supporting_citation
+  /Users/parmisu/docu-ai/tests/test_multi_source_citations.py:174: UserWarning: Relevance scores must be between 0 and 1, got [(Document(id='b0a802af-6889-40d2-9cfd-37c679af06b1', metadata={'page': 4, 'source': 'runtime_reference.pdf'}, page_content='OLLAMA_SOURCE Ollama runs the local language model used for answer generation.'), 0.34686251121274336), (Document(id='87f13485-17c9-4b28-9c1a-52f1c7b2b952', metadata={'page': 2, 'source': 'architecture_reference.pdf'}, page_content='CHROMA_SOURCE ChromaDB stores vector embeddings for semantic retrieval.'), 0.20922911141472023), (Document(id='3429f3b2-175a-4f6f-80cf-b42acf7d29a6', metadata={'page': 3, 'source': 'interface_reference.pdf'}, page_content='STREAMLIT_SOURCE Streamlit provides the PDF upload and question-answer interface.'), -0.17973774717134705), (Document(id='269f36d9-8aa8-439b-b7c0-40f3205f05a3', metadata={'source': 'architecture_reference.pdf', 'page': 6}, page_content='METADATA_SOURCE Retrieved chunks retain source names and page numbers for traceability.'), -0.18982323513891308), (Document(id='25751d9a-8659-4327-b15d-b64168980319', metadata={'source': 'misc_reference.pdf', 'page': 1}, page_content='DISTRACTOR This section discusses unrelated application configuration details.'), -0.29263052542499035)]
+    .similarity_search_with_relevance_scores(
+
+tests/test_multi_source_citations.py::test_each_claim_has_supporting_citation
+  /Users/parmisu/docu-ai/tests/test_multi_source_citations.py:174: UserWarning: Relevance scores must be between 0 and 1, got [(Document(id='269f36d9-8aa8-439b-b7c0-40f3205f05a3', metadata={'page': 6, 'source': 'architecture_reference.pdf'}, page_content='METADATA_SOURCE Retrieved chunks retain source names and page numbers for traceability.'), 0.23290038311868166), (Document(id='25751d9a-8659-4327-b15d-b64168980319', metadata={'source': 'misc_reference.pdf', 'page': 1}, page_content='DISTRACTOR This section discusses unrelated application configuration details.'), 0.05234024952491889), (Document(id='3429f3b2-175a-4f6f-80cf-b42acf7d29a6', metadata={'page': 3, 'source': 'interface_reference.pdf'}, page_content='STREAMLIT_SOURCE Streamlit provides the PDF upload and question-answer interface.'), -0.09639715898178447), (Document(id='b0a802af-6889-40d2-9cfd-37c679af06b1', metadata={'source': 'runtime_reference.pdf', 'page': 4}, page_content='OLLAMA_SOURCE Ollama runs the local language model used for answer generation.'), -0.15226407108842976), (Document(id='87f13485-17c9-4b28-9c1a-52f1c7b2b952', metadata={'source': 'architecture_reference.pdf', 'page': 2}, page_content='CHROMA_SOURCE ChromaDB stores vector embeddings for semantic retrieval.'), -0.18022757784474064)]
+    .similarity_search_with_relevance_scores(
+
+tests/test_retrieval.py::test_expected_reference_is_in_top_five
+  /Users/parmisu/docu-ai/tests/test_retrieval.py:121: UserWarning: Relevance scores must be between 0 and 1, got [(Document(id='b6a5a3ce-19c2-4e1a-95c7-673d2ebabbec', metadata={'source': 'retrieval_fixture.pdf', 'page': 2}, page_content='CHROMA_MARKER ChromaDB stores vector embeddings and supports semantic similarity retrieval.'), 0.5848871753528055), (Document(id='e3119369-9419-420e-8594-89b52b8ffc26', metadata={'source': 'retrieval_fixture.pdf', 'page': 5}, page_content='EMBEDDING_MARKER Sentence Transformers convert document chunks into vector embeddings.'), 0.3295184929946313), (Document(id='ba722480-dabc-4473-804c-db4784a9ee47', metadata={'source': 'retrieval_fixture.pdf', 'page': 3}, page_content='OLLAMA_MARKER Ollama runs the local language model used to generate answers.'), 0.003654064586468553), (Document(id='5fbab2f6-7ec0-49fa-920c-c0a40b867530', metadata={'page': 1, 'source': 'retrieval_fixture.pdf'}, page_content='PYTHON_MARKER Python is used for the document processing and application logic in Docu AI.'), -0.0797391228700357), (Document(id='9682b2c7-65c6-4b3f-920f-185946a90bcc', metadata={'source': 'retrieval_fixture.pdf', 'page': 6}, page_content='METADATA_MARKER Source names and page numbers are stored as metadata for traceability.'), -0.09576731647763759)]
+    .similarity_search_with_relevance_scores(
+
+tests/test_retrieval.py::test_expected_reference_is_in_top_five
+  /Users/parmisu/docu-ai/tests/test_retrieval.py:121: UserWarning: Relevance scores must be between 0 and 1, got [(Document(id='ba722480-dabc-4473-804c-db4784a9ee47', metadata={'source': 'retrieval_fixture.pdf', 'page': 3}, page_content='OLLAMA_MARKER Ollama runs the local language model used to generate answers.'), 0.5108696386412466), (Document(id='5fbab2f6-7ec0-49fa-920c-c0a40b867530', metadata={'source': 'retrieval_fixture.pdf', 'page': 1}, page_content='PYTHON_MARKER Python is used for the document processing and application logic in Docu AI.'), -0.1017677633001337), (Document(id='9682b2c7-65c6-4b3f-920f-185946a90bcc', metadata={'source': 'retrieval_fixture.pdf', 'page': 6}, page_content='METADATA_MARKER Source names and page numbers are stored as metadata for traceability.'), -0.16214185938653403), (Document(id='e3119369-9419-420e-8594-89b52b8ffc26', metadata={'page': 5, 'source': 'retrieval_fixture.pdf'}, page_content='EMBEDDING_MARKER Sentence Transformers convert document chunks into vector embeddings.'), -0.20422751067339018), (Document(id='b6a5a3ce-19c2-4e1a-95c7-673d2ebabbec', metadata={'source': 'retrieval_fixture.pdf', 'page': 2}, page_content='CHROMA_MARKER ChromaDB stores vector embeddings and supports semantic similarity retrieval.'), -0.26802039052360027)]
+    .similarity_search_with_relevance_scores(
+
+tests/test_retrieval.py::test_expected_reference_is_in_top_five
+  /Users/parmisu/docu-ai/tests/test_retrieval.py:121: UserWarning: Relevance scores must be between 0 and 1, got [(Document(id='264837a1-291c-480f-ba95-7076d9cd1017', metadata={'page': 4, 'source': 'retrieval_fixture.pdf'}, page_content='STREAMLIT_MARKER Streamlit provides the user interface for uploading PDFs and asking questions.'), 0.011784866013796247), (Document(id='5fbab2f6-7ec0-49fa-920c-c0a40b867530', metadata={'source': 'retrieval_fixture.pdf', 'page': 1}, page_content='PYTHON_MARKER Python is used for the document processing and application logic in Docu AI.'), 0.0072498651140240344), (Document(id='ba722480-dabc-4473-804c-db4784a9ee47', metadata={'page': 3, 'source': 'retrieval_fixture.pdf'}, page_content='OLLAMA_MARKER Ollama runs the local language model used to generate answers.'), -0.1352102760691638), (Document(id='9682b2c7-65c6-4b3f-920f-185946a90bcc', metadata={'source': 'retrieval_fixture.pdf', 'page': 6}, page_content='METADATA_MARKER Source names and page numbers are stored as metadata for traceability.'), -0.2673238717051092), (Document(id='b6a5a3ce-19c2-4e1a-95c7-673d2ebabbec', metadata={'page': 2, 'source': 'retrieval_fixture.pdf'}, page_content='CHROMA_MARKER ChromaDB stores vector embeddings and supports semantic similarity retrieval.'), -0.29665066042335364)]
+    .similarity_search_with_relevance_scores(
+
+tests/test_retrieval.py::test_expected_reference_is_in_top_five
+  /Users/parmisu/docu-ai/tests/test_retrieval.py:121: UserWarning: Relevance scores must be between 0 and 1, got [(Document(id='e3119369-9419-420e-8594-89b52b8ffc26', metadata={'source': 'retrieval_fixture.pdf', 'page': 5}, page_content='EMBEDDING_MARKER Sentence Transformers convert document chunks into vector embeddings.'), 0.6367849501477859), (Document(id='b6a5a3ce-19c2-4e1a-95c7-673d2ebabbec', metadata={'page': 2, 'source': 'retrieval_fixture.pdf'}, page_content='CHROMA_MARKER ChromaDB stores vector embeddings and supports semantic similarity retrieval.'), 0.23440620572227888), (Document(id='5fbab2f6-7ec0-49fa-920c-c0a40b867530', metadata={'page': 1, 'source': 'retrieval_fixture.pdf'}, page_content='PYTHON_MARKER Python is used for the document processing and application logic in Docu AI.'), -0.041071918172201016), (Document(id='264837a1-291c-480f-ba95-7076d9cd1017', metadata={'page': 4, 'source': 'retrieval_fixture.pdf'}, page_content='STREAMLIT_MARKER Streamlit provides the user interface for uploading PDFs and asking questions.'), -0.06303228070771127), (Document(id='ba722480-dabc-4473-804c-db4784a9ee47', metadata={'source': 'retrieval_fixture.pdf', 'page': 3}, page_content='OLLAMA_MARKER Ollama runs the local language model used to generate answers.'), -0.10140285588572628)]
+    .similarity_search_with_relevance_scores(
+
+tests/test_retrieval.py::test_top_five_results_are_inspectable
+  /Users/parmisu/docu-ai/tests/test_retrieval.py:207: UserWarning: Relevance scores must be between 0 and 1, got [(Document(id='216f08c6-dcb3-40d2-8b01-8cee11ebcaaa', metadata={'page': 2, 'source': 'retrieval_fixture.pdf'}, page_content='CHROMA_MARKER ChromaDB stores vector embeddings and supports semantic similarity retrieval.'), 0.5848871753528055), (Document(id='732b072d-bf8b-4f08-9146-44c061898849', metadata={'source': 'retrieval_fixture.pdf', 'page': 5}, page_content='EMBEDDING_MARKER Sentence Transformers convert document chunks into vector embeddings.'), 0.3295184929946313), (Document(id='bdeb458f-1fa0-4757-8048-e0d9646a2cce', metadata={'page': 3, 'source': 'retrieval_fixture.pdf'}, page_content='OLLAMA_MARKER Ollama runs the local language model used to generate answers.'), 0.003654064586468553), (Document(id='49db90ac-5fac-43c9-9d00-5a90312e1049', metadata={'page': 1, 'source': 'retrieval_fixture.pdf'}, page_content='PYTHON_MARKER Python is used for the document processing and application logic in Docu AI.'), -0.0797391228700357), (Document(id='d9fa88ef-3283-4707-8eaa-88c3d431da00', metadata={'page': 6, 'source': 'retrieval_fixture.pdf'}, page_content='METADATA_MARKER Source names and page numbers are stored as metadata for traceability.'), -0.09576731647763759)]
+    .similarity_search_with_relevance_scores(
+
+tests/test_retrieval.py::test_top_five_results_are_inspectable
+  /Users/parmisu/docu-ai/tests/test_retrieval.py:207: UserWarning: Relevance scores must be between 0 and 1, got [(Document(id='bdeb458f-1fa0-4757-8048-e0d9646a2cce', metadata={'page': 3, 'source': 'retrieval_fixture.pdf'}, page_content='OLLAMA_MARKER Ollama runs the local language model used to generate answers.'), 0.5108696386412466), (Document(id='49db90ac-5fac-43c9-9d00-5a90312e1049', metadata={'page': 1, 'source': 'retrieval_fixture.pdf'}, page_content='PYTHON_MARKER Python is used for the document processing and application logic in Docu AI.'), -0.1017677633001337), (Document(id='d9fa88ef-3283-4707-8eaa-88c3d431da00', metadata={'source': 'retrieval_fixture.pdf', 'page': 6}, page_content='METADATA_MARKER Source names and page numbers are stored as metadata for traceability.'), -0.16214185938653403), (Document(id='732b072d-bf8b-4f08-9146-44c061898849', metadata={'page': 5, 'source': 'retrieval_fixture.pdf'}, page_content='EMBEDDING_MARKER Sentence Transformers convert document chunks into vector embeddings.'), -0.20422751067339018), (Document(id='216f08c6-dcb3-40d2-8b01-8cee11ebcaaa', metadata={'source': 'retrieval_fixture.pdf', 'page': 2}, page_content='CHROMA_MARKER ChromaDB stores vector embeddings and supports semantic similarity retrieval.'), -0.26802039052360027)]
+    .similarity_search_with_relevance_scores(
+
+tests/test_retrieval.py::test_top_five_results_are_inspectable
+  /Users/parmisu/docu-ai/tests/test_retrieval.py:207: UserWarning: Relevance scores must be between 0 and 1, got [(Document(id='0e9d23f6-e470-48e5-a214-9f9a1f5243d8', metadata={'source': 'retrieval_fixture.pdf', 'page': 4}, page_content='STREAMLIT_MARKER Streamlit provides the user interface for uploading PDFs and asking questions.'), 0.011784866013796247), (Document(id='49db90ac-5fac-43c9-9d00-5a90312e1049', metadata={'source': 'retrieval_fixture.pdf', 'page': 1}, page_content='PYTHON_MARKER Python is used for the document processing and application logic in Docu AI.'), 0.0072498651140240344), (Document(id='bdeb458f-1fa0-4757-8048-e0d9646a2cce', metadata={'source': 'retrieval_fixture.pdf', 'page': 3}, page_content='OLLAMA_MARKER Ollama runs the local language model used to generate answers.'), -0.1352102760691638), (Document(id='d9fa88ef-3283-4707-8eaa-88c3d431da00', metadata={'source': 'retrieval_fixture.pdf', 'page': 6}, page_content='METADATA_MARKER Source names and page numbers are stored as metadata for traceability.'), -0.2673238717051092), (Document(id='216f08c6-dcb3-40d2-8b01-8cee11ebcaaa', metadata={'page': 2, 'source': 'retrieval_fixture.pdf'}, page_content='CHROMA_MARKER ChromaDB stores vector embeddings and supports semantic similarity retrieval.'), -0.29665066042335364)]
+    .similarity_search_with_relevance_scores(
+
+tests/test_retrieval.py::test_top_five_results_are_inspectable
+  /Users/parmisu/docu-ai/tests/test_retrieval.py:207: UserWarning: Relevance scores must be between 0 and 1, got [(Document(id='732b072d-bf8b-4f08-9146-44c061898849', metadata={'source': 'retrieval_fixture.pdf', 'page': 5}, page_content='EMBEDDING_MARKER Sentence Transformers convert document chunks into vector embeddings.'), 0.6367849501477859), (Document(id='216f08c6-dcb3-40d2-8b01-8cee11ebcaaa', metadata={'source': 'retrieval_fixture.pdf', 'page': 2}, page_content='CHROMA_MARKER ChromaDB stores vector embeddings and supports semantic similarity retrieval.'), 0.23440620572227888), (Document(id='49db90ac-5fac-43c9-9d00-5a90312e1049', metadata={'source': 'retrieval_fixture.pdf', 'page': 1}, page_content='PYTHON_MARKER Python is used for the document processing and application logic in Docu AI.'), -0.041071918172201016), (Document(id='0e9d23f6-e470-48e5-a214-9f9a1f5243d8', metadata={'page': 4, 'source': 'retrieval_fixture.pdf'}, page_content='STREAMLIT_MARKER Streamlit provides the user interface for uploading PDFs and asking questions.'), -0.06303228070771127), (Document(id='bdeb458f-1fa0-4757-8048-e0d9646a2cce', metadata={'page': 3, 'source': 'retrieval_fixture.pdf'}, page_content='OLLAMA_MARKER Ollama runs the local language model used to generate answers.'), -0.10140285588572628)]
+    .similarity_search_with_relevance_scores(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+---- generated xml file: /Users/parmisu/docu-ai/artifacts/pytest-report.xml ----
+=========================== short test summary info ============================
+SKIPPED [2] tests/test_abstention.py: requires a real local Ollama service and model; run with RUN_OLLAMA_TESTS=1
+SKIPPED [2] tests/test_answer_generation.py: requires a real local Ollama service and model; run with RUN_OLLAMA_TESTS=1
+SKIPPED [3] tests/test_conflicting_evidence.py: requires a real local Ollama service and model; run with RUN_OLLAMA_TESTS=1
+FAILED tests/test_ollama_connection_errors.py::test_connection_failures_are_handled
+FAILED tests/test_ollama_connection_errors.py::test_failure_does_not_leave_answer_content
+====== 2 failed, 105 passed, 7 skipped, 23 warnings in 143.27s (0:02:23) =======
