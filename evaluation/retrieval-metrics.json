@@ -1,0 +1,56 @@
+{
+  "top_k": 5,
+  "evaluated_question_count": 20,
+  "excluded_question_count": 12,
+  "excluded_question_types": [
+    "irrelevant",
+    "unanswerable"
+  ],
+  "macro_recall_at_5": 0.8892857142857142,
+  "mrr_at_5": 0.7416666666666667,
+  "perfect_recall_case_count": 16,
+  "failure_count": 4,
+  "failures": [
+    {
+      "case_id": "eval-013",
+      "question": "How does Docu AI retrieve information and generate an answer?",
+      "recall_at_5": 0.5,
+      "mrr_at_5": 0.3333333333333333,
+      "missed_markers": [
+        "GENERATION_MARKER"
+      ]
+    },
+    {
+      "case_id": "eval-016",
+      "question": "What provides the user interface and what metadata supports traceability?",
+      "recall_at_5": 0.5,
+      "mrr_at_5": 0.5,
+      "missed_markers": [
+        "STREAMLIT_SOURCE"
+      ]
+    },
+    {
+      "case_id": "eval-017",
+      "question": "Which components handle embedding, storage, retrieval, and answer generation?",
+      "recall_at_5": 0.5,
+      "mrr_at_5": 1.0,
+      "missed_markers": [
+        "RETRIEVAL_MARKER",
+        "GENERATION_MARKER"
+      ]
+    },
+    {
+      "case_id": "eval-018",
+      "question": "What happens from PDF upload through source traceability?",
+      "recall_at_5": 0.2857142857142857,
+      "mrr_at_5": 1.0,
+      "missed_markers": [
+        "EMBEDDING_MARKER",
+        "STORAGE_MARKER",
+        "RETRIEVAL_MARKER",
+        "GENERATION_MARKER",
+        "SOURCE_MARKER"
+      ]
+    }
+  ]
+}
