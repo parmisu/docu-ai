@@ -1,0 +1,5 @@
+case_id,question,claim,expected_source,expected_page,status,citation_rank,actual_source,actual_page,evidence_supports_claim,score
+multi-source-001,What stores embeddings and what runs the local language model?,ChromaDB stores vector embeddings.,architecture_reference.pdf,2,FOUND,2,architecture_reference.pdf,2,True,0.209229
+multi-source-001,What stores embeddings and what runs the local language model?,Ollama runs the local language model.,runtime_reference.pdf,4,FOUND,1,runtime_reference.pdf,4,True,0.346863
+multi-source-002,What provides the interface and what metadata supports traceability?,Streamlit provides the user interface.,interface_reference.pdf,3,FOUND,3,interface_reference.pdf,3,True,-0.096397
+multi-source-002,What provides the interface and what metadata supports traceability?,Source names and page numbers support traceability.,architecture_reference.pdf,6,FOUND,1,architecture_reference.pdf,6,True,0.2329

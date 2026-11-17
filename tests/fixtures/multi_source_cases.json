@@ -1,0 +1,80 @@
+{
+    "documents": [
+      {
+        "text": "CHROMA_SOURCE ChromaDB stores vector embeddings for semantic retrieval.",
+        "source": "architecture_reference.pdf",
+        "page": 2
+      },
+      {
+        "text": "OLLAMA_SOURCE Ollama runs the local language model used for answer generation.",
+        "source": "runtime_reference.pdf",
+        "page": 4
+      },
+      {
+        "text": "STREAMLIT_SOURCE Streamlit provides the PDF upload and question-answer interface.",
+        "source": "interface_reference.pdf",
+        "page": 3
+      },
+      {
+        "text": "METADATA_SOURCE Retrieved chunks retain source names and page numbers for traceability.",
+        "source": "architecture_reference.pdf",
+        "page": 6
+      },
+      {
+        "text": "DISTRACTOR This section discusses unrelated application configuration details.",
+        "source": "misc_reference.pdf",
+        "page": 1
+      }
+    ],
+    "cases": [
+      {
+        "id": "multi-source-001",
+        "question": "What stores embeddings and what runs the local language model?",
+        "claims": [
+          {
+            "claim": "ChromaDB stores vector embeddings.",
+            "expected_source": "architecture_reference.pdf",
+            "expected_page": 2,
+            "required_terms": [
+              "chromadb",
+              "vector embeddings"
+            ]
+          },
+          {
+            "claim": "Ollama runs the local language model.",
+            "expected_source": "runtime_reference.pdf",
+            "expected_page": 4,
+            "required_terms": [
+              "ollama",
+              "local language model"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "multi-source-002",
+        "question": "What provides the interface and what metadata supports traceability?",
+        "claims": [
+          {
+            "claim": "Streamlit provides the user interface.",
+            "expected_source": "interface_reference.pdf",
+            "expected_page": 3,
+            "required_terms": [
+              "streamlit",
+              "interface"
+            ]
+          },
+          {
+            "claim": "Source names and page numbers support traceability.",
+            "expected_source": "architecture_reference.pdf",
+            "expected_page": 6,
+            "required_terms": [
+              "source names",
+              "page numbers",
+              "traceability"
+            ]
+          }
+        ]
+      }
+    ]
+  }
