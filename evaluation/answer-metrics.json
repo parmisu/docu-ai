@@ -1,0 +1,85 @@
+{
+  "total_cases": 32,
+  "answerable_cases": 20,
+  "unsupported_cases": 12,
+  "answer_correctness_accuracy": 0.75,
+  "full_citation_accuracy": 0.8,
+  "mean_citation_coverage": 0.8892857142857142,
+  "abstention_accuracy": 1.0,
+  "overall_case_pass_rate": 0.75,
+  "failure_count": 8,
+  "failures": [
+    {
+      "id": "eval-005",
+      "question_type": "direct",
+      "question": "What converts document chunks into vector embeddings?",
+      "model_answer": "ANSWER CANNOT BE FOUND IN THE PROVIDED DOCUMENT.",
+      "answer_correct": false,
+      "abstained": null,
+      "citation_coverage": 1.0
+    },
+    {
+      "id": "eval-006",
+      "question_type": "direct",
+      "question": "What retrieves chunks relevant to the user question?",
+      "model_answer": "ANSWER CANNOT BE FOUND IN THE PROVIDED DOCUMENT.",
+      "answer_correct": false,
+      "abstained": null,
+      "citation_coverage": 1.0
+    },
+    {
+      "id": "eval-013",
+      "question_type": "multi-part",
+      "question": "How does Docu AI retrieve information and generate an answer?",
+      "model_answer": "Based on the retrieved context, here is the answer:\n\nDocu AI retrieves information and generates an answer through the following steps:\n\n1. Similarity search retrieves document chunks relevant to the user's question (Result 3).\n2. The local language model (Ollama) is used to process the document and application logic (Result 4).\n3. The local language model (Ollama) is also used to generate answers (Result 4).\n4. Streamlit provides the PDF upload and question-answer interface (Result 5).\n5. Python is used for the document processing and application logic in Docu AI (Result 1).\n\nNote: The sources conflict on the specific role of Ollama in generating answers, with Result 4 stating it generates answers and Result 2 stating it runs the local language model used for answer generation.",
+      "answer_correct": true,
+      "abstained": null,
+      "citation_coverage": 0.5
+    },
+    {
+      "id": "eval-016",
+      "question_type": "multi-part",
+      "question": "What provides the user interface and what metadata supports traceability?",
+      "model_answer": "Based on the retrieved results, the user interface is provided by Python (Result 3), and the metadata that supports traceability is stored as metadata for source names and page numbers (Result 1 and Result 5).",
+      "answer_correct": true,
+      "abstained": null,
+      "citation_coverage": 0.5
+    },
+    {
+      "id": "eval-017",
+      "question_type": "multi-part",
+      "question": "Which components handle embedding, storage, retrieval, and answer generation?",
+      "model_answer": "Based on the retrieved context, the components that handle embedding, storage, retrieval, and answer generation are:\n\n- Embedding: Sentence Transformers (Result 4 and Result 5) and ChromaDB (Result 1 and Result 3)\n- Storage: ChromaDB (Result 1 and Result 3)\n- Retrieval: ChromaDB (Result 1 and Result 3) and Sentence Transformers (Result 4 and Result 5)\n- Answer Generation: Ollama (Result 2)\n\nSources conflict on the storage component, with Result 1 and Result 3 stating ChromaDB, while Result 4 and Result 5 state Sentence Transformers.",
+      "answer_correct": false,
+      "abstained": null,
+      "citation_coverage": 0.5
+    },
+    {
+      "id": "eval-018",
+      "question_type": "multi-part",
+      "question": "What happens from PDF upload through source traceability?",
+      "model_answer": "Based on the retrieved context, here is the answer:\n\nFrom PDF upload, the process involves the following steps:\n\n1. The user uploads a PDF document through the Streamlit interface (Result 2).\n2. PyPDF extracts text from each uploaded PDF page before further processing (Result 1).\n3. The extracted text, along with source names and page numbers, is stored as metadata for traceability (Result 4).\n4. Retrieved chunks retain source names and page numbers for traceability (Result 5).\n\nThis process allows for source traceability, enabling the tracking of the origin of the extracted text.",
+      "answer_correct": true,
+      "abstained": null,
+      "citation_coverage": 0.2857142857142857
+    },
+    {
+      "id": "eval-031",
+      "question_type": "conflicting",
+      "question": "According to the available sources, what is the Nova protocol timeout?",
+      "model_answer": "ANSWER CANNOT BE FOUND IN THE PROVIDED DOCUMENT.",
+      "answer_correct": false,
+      "abstained": null,
+      "citation_coverage": 1.0
+    },
+    {
+      "id": "eval-032",
+      "question_type": "conflicting",
+      "question": "Do the Nova protocol sources agree on the timeout value?",
+      "model_answer": "ANSWER CANNOT BE FOUND IN THE PROVIDED DOCUMENT.",
+      "answer_correct": false,
+      "abstained": null,
+      "citation_coverage": 1.0
+    }
+  ]
+}
