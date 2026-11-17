@@ -239,3 +239,34 @@ Full suite including Ollama:
 ```bash
 RUN_OLLAMA_TESTS=1 python -m pytest -v
 ```
+
+## Continuous Integration
+
+Automated independent tests run through GitHub Actions using:
+
+`.github/workflows/tests.yml`
+
+The CI workflow is triggered for pushes and pull requests targeting `main`.
+
+CI uses Python 3.11 and installs dependencies from:
+
+`requirements.txt`
+
+The main CI command is:
+
+```bash
+python -m pytest -m "not integration" -v \
+  --junitxml=artifacts/pytest-report.xml
+```
+
+The workflow also captures terminal output and uploads both pytest reports as GitHub Actions artifacts.
+
+Real Ollama tests are intentionally excluded from the required GitHub-hosted CI job because they depend on a local Ollama service and installed local model.
+
+They remain reproducible separately with:
+
+```bash
+RUN_OLLAMA_TESTS=1 python -m pytest -m integration -v
+```
+
+A CI failure must remain visible as a failed workflow run. Test failures are not converted to successful results and generated reports are uploaded with `if: always()` so failure evidence remains inspectable.

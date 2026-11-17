@@ -3,11 +3,11 @@
   "answerable_cases": 20,
   "unsupported_cases": 12,
   "answer_correctness_accuracy": 0.75,
-  "full_citation_accuracy": 0.8,
-  "mean_citation_coverage": 0.8892857142857142,
+  "full_citation_accuracy": 0.75,
+  "mean_citation_coverage": 0.8642857142857143,
   "abstention_accuracy": 1.0,
-  "overall_case_pass_rate": 0.75,
-  "failure_count": 8,
+  "overall_case_pass_rate": 0.71875,
+  "failure_count": 9,
   "failures": [
     {
       "id": "eval-005",
@@ -26,6 +26,15 @@
       "answer_correct": false,
       "abstained": null,
       "citation_coverage": 1.0
+    },
+    {
+      "id": "eval-012",
+      "question_type": "multi-part",
+      "question": "How are document chunks converted and stored for semantic search?",
+      "model_answer": "Based on the retrieved context, document chunks are converted into vector embeddings using Sentence Transformers (Result 5, Source: retrieval_fixture.pdf, Page: 5) and then stored in ChromaDB (Result 3, Source: multi_chunk_fixture.pdf, Page: 4) and Result 4, Source: architecture_reference.pdf, Page: 2) for semantic retrieval.",
+      "answer_correct": true,
+      "abstained": null,
+      "citation_coverage": 0.5
     },
     {
       "id": "eval-013",
