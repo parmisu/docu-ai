@@ -185,10 +185,9 @@ def test_failure_does_not_leave_answer_content():
         "ok": False,
         "content": None,
         "user_message": (
-            "The local AI model is currently "
-            "unavailable. Please make sure Ollama "
-            "is running and try again."
-        ),
+    "Ollama could not be reached. Make sure the "
+    "Ollama service is running and try again."
+),
         "error_type": (
             "connection_error"
         ),
@@ -239,9 +238,6 @@ def test_fixture_defines_failure_scenarios():
             "raw_error"
         ]
 
-        assert (
-            scenario[
-                "expected_error_type"
-            ]
-            == "connection_error"
-        )
+        assert scenario[
+            "expected_error_type"
+        ]

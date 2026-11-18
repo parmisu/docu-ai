@@ -43,11 +43,11 @@ They pass only when the generated answer explicitly states that the evidence is 
 ## Numerical Results
 
 - Answer correctness accuracy: `0.7500`
-- Full citation accuracy: `0.8000`
-- Mean citation coverage: `0.8893`
+- Full citation accuracy: `0.7500`
+- Mean citation coverage: `0.8643`
 - Abstention accuracy: `1.0000`
-- Overall case pass rate: `0.7500`
-- Failure count: `8`
+- Overall case pass rate: `0.7188`
+- Failure count: `9`
 
 ## Failure Examples
 
@@ -77,6 +77,20 @@ Model answer:
 
 ```text
 ANSWER CANNOT BE FOUND IN THE PROVIDED DOCUMENT.
+```
+
+### eval-012
+
+- Type: `multi-part`
+- Question: How are document chunks converted and stored for semantic search?
+- Answer correct: `True`
+- Abstained: `None`
+- Citation coverage: `0.5`
+
+Model answer:
+
+```text
+Based on the retrieved context, document chunks are converted into vector embeddings using Sentence Transformers (Result 5, Source: retrieval_fixture.pdf, Page: 5) and then stored in ChromaDB (Result 3, Source: multi_chunk_fixture.pdf, Page: 4) and Result 4, Source: architecture_reference.pdf, Page: 2) for semantic retrieval.
 ```
 
 ### eval-013
