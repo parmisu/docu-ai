@@ -1,969 +1,1310 @@
+from __future__ import annotations
+
+import hashlib
+import html
+from io import BytesIO
+from pathlib import Path
 import re
+import time
+
 import streamlit as st
+from pypdf import PdfReader
+from langchain_chroma import Chroma
+from langchain_core.documents import Document
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_ollama import ChatOllama
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+from ollama_error_handling import invoke_ollama_safely
+from pdf_validation import has_pdf_signature
+from text_cleaning import clean_extracted_text
+from ui_theme import (
+    ICON_EXTERNAL,
+    ICON_FILE,
+    ICON_LOCK,
+    ICON_MENU,
+    ICON_MORE,
+    LOGO_SVG,
+    apply_docu_theme,
+    image_data_uri,
+)
+
+
+BASE_DIR = Path(__file__).resolve().parent
+LOGO_PATH = BASE_DIR / "docs" / "docu_ai_logo.png"
+
+MODEL_NAME = "llama3.2:3b"
+CHUNK_SIZE = 1000
+CHUNK_OVERLAP = 200
+TOP_K = 5
+RELEVANCE_THRESHOLD = 0.15
+MAX_UPLOAD_MB = 50
+
+
+st.set_page_config(
+    page_title="DocU AI",
+    page_icon="✦",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
+
+apply_docu_theme()
+
+
+# ==================================================
+# RAG RESOURCES
+# ==================================================
 
 @st.cache_resource
-def get_embeddings():
+def get_embeddings() -> HuggingFaceEmbeddings:
     return HuggingFaceEmbeddings(
         model_name="sentence-transformers/all-MiniLM-L6-v2"
     )
-@st.cache_resource
-def get_vector_store(document_key, _documents):
-    embeddings = get_embeddings()
 
+
+@st.cache_resource
+def get_vector_store(
+    document_key: str,
+    _documents: list[Document],
+) -> Chroma:
     return Chroma.from_documents(
         documents=_documents,
-        embedding=embeddings,
+        embedding=get_embeddings(),
     )
-import hashlib
-from io import BytesIO
-from pypdf import PdfReader
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_chroma import Chroma
-from langchain_ollama import ChatOllama
-from langchain_core.documents import Document
-from pdf_validation import has_pdf_signature
-from text_cleaning import clean_extracted_text
-
-# ==================================================
-# PAGE CONFIG
-# ==================================================
-
-st.set_page_config(
-    page_title="Docu AI",
-    page_icon="✦",
-    layout="centered",
-)
 
 
 # ==================================================
-# CUSTOM CSS
+# SESSION STATE
 # ==================================================
 
-st.markdown(
-    """
-<style>
-
-/* ---------- GLOBAL ---------- */
-
-.stApp {
-    background:
-        radial-gradient(
-            circle at 15% 5%,
-            rgba(222, 230, 255, 0.68),
-            transparent 30%
-        ),
-        radial-gradient(
-            circle at 85% 8%,
-            rgba(244, 226, 255, 0.62),
-            transparent 28%
-        ),
-        linear-gradient(
-            180deg,
-            #fcfcff 0%,
-            #f7f8fd 100%
-        );
-    color: #282b38;
-
-    /* ---------- ASK BUTTON ---------- */
-
-[data-testid="stFormSubmitButton"] {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 0.6rem;
-}
-
-[data-testid="stFormSubmitButton"] button {
-    width: auto !important;
-
-    border: none !important;
-
-    border-radius: 16px !important;
-
-    background:
-        linear-gradient(
-            135deg,
-            #e7edff,
-            #f3e3ff
-        ) !important;
-
-    color:
-        #454a5f !important;
-
-    font-weight:
-        700 !important;
-
-    padding:
-        0.7rem 1.15rem !important;
-
-    box-shadow:
-        0 10px 26px rgba(95, 103, 160, 0.10);
-
-    transition:
-        transform 0.18s ease,
-        box-shadow 0.2s ease;
-}
-
-[data-testid="stFormSubmitButton"] button:hover {
-    transform:
-        translateY(-2px);
-
-    box-shadow:
-        0 14px 32px rgba(95, 103, 160, 0.15);
-}
-
-[data-testid="stFormSubmitButton"] button:active {
-    transform:
-        scale(0.97);
-}
-}
-
-.block-container {
-    max-width: 760px;
-    margin: 0 auto;
-    padding-top: 2.2rem;
-    padding-bottom: 5rem;
-}
-
-html {
-    scroll-behavior: smooth;
-}
-
-
-/* ---------- HERO ---------- */
-
-.hero {
-    max-width: 680px;
-    margin: 0 auto;
-    text-align: center;
-    padding: 1.2rem 0 1.8rem 0;
-    animation: fadeUp 0.65s ease both;
-}
-
-.hero-title {
-    font-size: 2.15rem;
-    line-height: 1.1;
-    font-weight: 760;
-    letter-spacing: -0.045em;
-    margin: 0;
-    color: #262936;
-}
-
-.hero-subtitle {
-    margin-top: 0.65rem;
-    font-size: 1rem;
-    color: #7b8091;
-}
-
-
-/* ---------- LOCAL BADGE ---------- */
-
-.local-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-
-    margin-top: 0.9rem;
-    padding: 0.42rem 0.72rem;
-
-    border-radius: 999px;
-
-    background: rgba(255,255,255,0.78);
-
-    border: 1px solid rgba(184,190,214,0.42);
-
-    backdrop-filter: blur(14px);
-
-    color: #666b7b;
-    font-size: 0.8rem;
-
-    box-shadow: 0 8px 22px rgba(80,86,130,0.06);
-}
-
-.status-dot {
-    width: 8px;
-    height: 8px;
-
-    border-radius: 50%;
-
-    background: #89d7aa;
-
-    box-shadow:
-        0 0 0 5px rgba(137, 215, 170, 0.12);
-}
-
-
-/* ---------- GENERAL CARD ---------- */
-
-.glass-card {
-    max-width: 680px;
-    margin: 1rem auto;
-
-    background:
-        rgba(255, 255, 255, 0.78);
-
-    backdrop-filter: blur(18px);
-
-    border:
-        1px solid rgba(190, 196, 220, 0.42);
-
-    border-radius: 24px;
-
-    padding: 1.25rem 1.35rem;
-
-    box-shadow:
-        0 16px 44px rgba(69, 75, 112, 0.07);
-
-    animation:
-        fadeUp 0.5s ease both;
-}
-
-.glass-card:hover {
-    transform: translateY(-2px);
-
-    box-shadow:
-        0 22px 55px rgba(69, 75, 112, 0.1);
-}
-
-
-/* ---------- LABELS ---------- */
-
-.section-label {
-    font-size: 0.76rem;
-
-    text-transform: uppercase;
-
-    letter-spacing: 0.13em;
-
-    font-weight: 800;
-
-    color: #9b9faf;
-
-    margin-bottom: 0.55rem;
-}
-
-.doc-name {
-    font-size: 1.02rem;
-    font-weight: 700;
-
-    color: #333746;
-}
-
-.doc-meta {
-    margin-top: 0.3rem;
-
-    color: #8a8f9f;
-
-    font-size: 0.88rem;
-}
-
-
-/* ---------- FILE UPLOADER ---------- */
-
-[data-testid="stFileUploader"] {
-    max-width: 680px;
-
-    margin-left: auto;
-    margin-right: auto;
-
-    background:
-        rgba(255, 255, 255, 0.75);
-
-    border:
-        1px solid rgba(188, 194, 218, 0.42);
-
-    border-radius: 24px;
-
-    padding: 0.85rem;
-
-    box-shadow:
-        0 16px 42px rgba(69, 75, 112, 0.065);
-
-    transition:
-        transform 0.2s ease,
-        border-color 0.2s ease,
-        box-shadow 0.2s ease;
-}
-
-[data-testid="stFileUploader"]:hover {
-    transform: translateY(-2px);
-
-    border-color:
-        rgba(164, 175, 238, 0.75);
-
-    box-shadow:
-        0 21px 52px rgba(86, 94, 148, 0.11);
-}
-
-[data-testid="stFileUploader"] button {
-    border: none !important;
-
-    border-radius: 16px !important;
-
-    background:
-        linear-gradient(
-            135deg,
-            #e8edff,
-            #f5e6ff
-        ) !important;
-
-    color: #484d63 !important;
-
-    font-weight: 700 !important;
-
-    transition:
-        transform 0.16s ease,
-        box-shadow 0.2s ease;
-}
-
-[data-testid="stFileUploader"] button:hover {
-    transform:
-        translateY(-1px)
-        scale(1.02);
-
-    box-shadow:
-        0 9px 24px rgba(108, 117, 177, 0.15);
-}
-
-[data-testid="stFileUploader"] button:active {
-    transform: scale(0.97);
-}
-
-
-/* ---------- QUESTION COMPOSER ---------- */
-
-.stTextInput {
-    max-width: 680px;
-    margin: 0.9rem auto 0 auto;
-}
-
-.stTextInput label {
-    display: none;
-}
-
-.stTextInput > div {
-    position: relative;
-}
-
-.stTextInput > div > div {
-    border-radius: 24px !important;
-    background: rgba(255, 255, 255, 0.9) !important;
-    border: 1px solid rgba(186, 191, 216, 0.48) !important;
-
-    box-shadow:
-        0 14px 36px rgba(72, 78, 119, 0.07);
-
-    transition:
-        transform 0.2s ease,
-        box-shadow 0.22s ease,
-        border-color 0.22s ease;
-}
-
-.stTextInput > div > div:hover {
-    transform: translateY(-2px);
-
-    border-color:
-        rgba(161, 173, 236, 0.8) !important;
-
-    box-shadow:
-        0 18px 44px rgba(82, 89, 146, 0.1);
-}
-
-.stTextInput > div > div:focus-within {
-    transform: translateY(-2px);
-
-    border-color:
-        #b5b9ff !important;
-
-    box-shadow:
-        0 0 0 4px rgba(181, 185, 255, 0.12),
-        0 20px 48px rgba(87, 93, 150, 0.12);
-}
-
-.stTextInput input {
-    border: none !important;
-    background: transparent !important;
-    box-shadow: none !important;
-
-    padding:
-        1rem 1.1rem !important;
-
-    font-size:
-        1rem !important;
-
-    color:
-        #303442 !important;
-}
-
-.stTextInput input::placeholder {
-    color:
-        #a2a7b5 !important;
-}
-
-
-/* ---------- ANSWER CONTAINER ---------- */
-
-[data-testid="stVerticalBlockBorderWrapper"] {
-    max-width: 680px;
-
-    margin:
-        0.7rem auto 0 auto;
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(255,255,255,0.95),
-            rgba(247,248,255,0.90)
-        );
-
-    border:
-        1px solid rgba(188,195,221,0.42) !important;
-
-    border-radius:
-        24px !important;
-
-    padding:
-        1.1rem 1.25rem !important;
-
-    box-shadow:
-        0 18px 46px rgba(71,76,116,0.075);
-
-    animation:
-        answerIn 0.5s cubic-bezier(.2,.8,.2,1) both;
-
-    transition:
-        transform 0.2s ease,
-        box-shadow 0.2s ease;
-}
-
-[data-testid="stVerticalBlockBorderWrapper"]:hover {
-    transform:
-        translateY(-2px);
-
-    box-shadow:
-        0 22px 56px rgba(71,76,116,0.105);
-}
-
-[data-testid="stVerticalBlockBorderWrapper"]
-[data-testid="stVerticalBlock"] {
-    gap: 0.45rem;
-}
-
-
-/* ---------- SOURCES ---------- */
-
-details {
-    width: 100%;
-    max-width: 650px;
-
-    margin:
-        0 auto 0.55rem auto !important;
-
-    border-radius:
-        17px !important;
-
-    border:
-        1px solid rgba(190,196,216,0.45) !important;
-
-    background:
-        rgba(255,255,255,0.76) !important;
-
-    overflow: hidden;
-
-    box-shadow: none !important;
-
-    transition:
-        transform 0.18s ease,
-        background 0.2s ease,
-        box-shadow 0.2s ease,
-        border-color 0.2s ease;
-}
-
-details:hover {
-    transform:
-        translateY(-2px);
-
-    background:
-        rgba(250,250,255,0.94) !important;
-
-    border-color:
-        rgba(166,176,236,0.72) !important;
-
-    box-shadow:
-        0 10px 28px rgba(87,93,140,0.07) !important;
-}
-
-details summary {
-    font-size:
-        0.91rem;
-
-    color:
-        #626879;
-
-    cursor:
-        pointer;
-}
-
-
-/* ---------- SPINNER ---------- */
-
-[data-testid="stSpinner"] {
-    max-width: 680px;
-
-    margin-left: auto;
-    margin-right: auto;
-
-    padding:
-        0.6rem 0;
-}
-
-
-/* ---------- ANIMATIONS ---------- */
-
-@keyframes fadeUp {
-
-    from {
-        opacity: 0;
-        transform:
-            translateY(12px);
+def init_state() -> None:
+    defaults = {
+        # Documents uploaded in this session, in upload order:
+        # [{"key", "name", "bytes"}]
+        "documents": [],
+        "current_doc_key": None,
+        "messages": [],
+        "preview_page": 1,
+        "source_pages": [],
+        "uploader_nonce": 0,
     }
 
-    to {
-        opacity: 1;
-        transform:
-            translateY(0);
-    }
-}
-
-@keyframes answerIn {
-
-    from {
-        opacity: 0;
-
-        transform:
-            translateY(16px)
-            scale(0.987);
-    }
-
-    to {
-        opacity: 1;
-
-        transform:
-            translateY(0)
-            scale(1);
-    }
-}
-
-</style>
-""",
-    unsafe_allow_html=True,
-)
+    for key, value in defaults.items():
+        if key not in st.session_state:
+            st.session_state[key] = value
 
 
-# ==================================================
-# HERO
-# ==================================================
+def reset_chat() -> None:
+    st.session_state.messages = []
+    st.session_state.source_pages = []
+    st.session_state.preview_page = 1
 
-st.markdown(
-    """
-<div class="hero">
-<h1 class="hero-title">Docu AI</h1>
-<div class="hero-subtitle">Ask your documents anything.</div>
-<div class="local-badge">
-<span class="status-dot"></span>
-Local AI · Private · Runs on device
-</div>
-</div>
-""",
-    unsafe_allow_html=True,
-)
+
+def find_document(
+    document_key: str | None,
+) -> dict | None:
+    for document in st.session_state.documents:
+        if document["key"] == document_key:
+            return document
+    return None
+
+
+def open_document(
+    name: str,
+    data: bytes,
+) -> None:
+    """Add a document to the session (deduplicated) and make it current."""
+
+    document_key = hashlib.sha256(data).hexdigest()
+
+    if find_document(document_key) is None:
+        st.session_state.documents.append(
+            {
+                "key": document_key,
+                "name": name,
+                "bytes": data,
+            }
+        )
+
+    if st.session_state.current_doc_key != document_key:
+        st.session_state.current_doc_key = document_key
+        reset_chat()
 
 
 # ==================================================
-# UPLOAD
+# LOGO
 # ==================================================
 
-uploaded_file = st.file_uploader(
-    "Upload a PDF document",
-    type=["pdf"],
-    label_visibility="collapsed",
-)
+def logo_markup() -> str:
+    logo_uri = image_data_uri(LOGO_PATH)
+
+    if logo_uri:
+        # st.html strips <img>, so the logo is drawn as a background.
+        visual = (
+            '<span class="docu-brand-logo" '
+            f'style="background-image:url(\'{logo_uri}\')"></span>'
+        )
+    else:
+        visual = LOGO_SVG
+
+    return (
+        '<div class="docu-brand">'
+        f'{visual}'
+        '<div class="docu-brand-name">DocU AI</div>'
+        '</div>'
+    )
 
 
 # ==================================================
-# DOCUMENT PROCESSING
+# SIDEBAR
 # ==================================================
-question = ""
-submitted = False
 
-if uploaded_file is not None:
-    uploaded_bytes = uploaded_file.getvalue()
+def render_sidebar() -> None:
 
-    document_key = hashlib.sha256(
+    with st.sidebar:
+
+        st.html(logo_markup())
+
+        if st.button(
+            "New chat",
+            key="new_chat",
+            icon=":material/add:",
+            width="stretch",
+        ):
+            st.session_state.current_doc_key = None
+            reset_chat()
+            st.rerun()
+
+        nav_items = "".join(
+            f'<div class="sidebar-nav-item">{ICON_MENU}'
+            f'<span>{label}</span></div>'
+            for label in (
+                "Overview",
+                "All documents",
+                "Starred",
+            )
+        )
+
+        st.html(
+            '<div class="sidebar-section-label">Workspace</div>'
+            f'<div class="sidebar-nav">{nav_items}</div>'
+            '<div class="sidebar-section-label">Your documents</div>'
+        )
+
+        with st.container(key="sidebar_docs"):
+
+            if not st.session_state.documents:
+                st.html(
+                    '<div class="sidebar-empty">'
+                    'Documents you upload will appear here.'
+                    '</div>'
+                )
+
+            for document in st.session_state.documents:
+
+                is_active = (
+                    document["key"]
+                    == st.session_state.current_doc_key
+                )
+
+                prefix = "doc_active_" if is_active else "doc_"
+
+                if st.button(
+                    document["name"],
+                    key=f"{prefix}{document['key'][:16]}",
+                    icon=":material/draft:",
+                    width="stretch",
+                    help=document["name"],
+                ) and not is_active:
+                    st.session_state.current_doc_key = document["key"]
+                    reset_chat()
+                    st.rerun()
+
+        st.html(
+            '<div class="sidebar-footer">'
+            '<div class="sidebar-avatar"></div>'
+            '<div>'
+            '<div class="sidebar-footer-title">Your workspace</div>'
+            '<div class="sidebar-footer-meta">Local · Private</div>'
+            '</div>'
+            '</div>'
+        )
+
+
+# ==================================================
+# QUESTION VALIDATION
+# ==================================================
+
+def validate_question(
+    question: str,
+) -> str | None:
+
+    if len(question) < 3:
+        return (
+            "Please enter a longer question."
+        )
+
+    if not re.search(
+        r"[A-Za-z0-9]",
+        question,
+    ):
+        return (
+            "Please enter a question using words, "
+            "not only emojis or symbols."
+        )
+
+    if len(question) > 500:
+        return (
+            "Your question is too long. "
+            "Please keep it under 500 characters."
+        )
+
+    return None
+
+
+# ==================================================
+# PDF READING
+# ==================================================
+
+def read_pdf(
+    uploaded_bytes: bytes,
+    source_name: str,
+):
+
+    buffer = BytesIO(
         uploaded_bytes
-    ).hexdigest()
+    )
 
-    if not has_pdf_signature(uploaded_file):
-        st.error(
+    if not has_pdf_signature(
+        buffer
+    ):
+        raise ValueError(
             "The uploaded file is not a valid PDF. "
             "Please upload a genuine PDF document."
         )
-        st.stop()
 
-    with st.spinner("Reading your document..."):
+    try:
+        reader = PdfReader(
+            BytesIO(
+                uploaded_bytes
+            )
+        )
+
+    except Exception as exc:
+
+        raise ValueError(
+            "This PDF could not be opened. "
+            "The file may be corrupted, incomplete, "
+            "or not a valid PDF."
+        ) from exc
+
+    page_documents: list[Document] = []
+    page_texts: list[str] = []
+
+    for page_number, page in enumerate(
+        reader.pages,
+        start=1,
+    ):
 
         try:
-            reader = PdfReader(uploaded_file)
 
-            page_documents = []
-
-            for page_number, page in enumerate(
-                reader.pages,
-                start=1,
-            ):
-
-                try:
-                    page_text = clean_extracted_text(
-    page.extract_text() or ""
-)
-
-                except Exception:
-                    st.error(
-                        "The PDF could not be read correctly. "
-                        "One or more pages may be corrupted or incomplete."
-                    )
-                    st.stop()
-
-                if page_text:
-
-                    page_documents.append(
-                        Document(
-                            page_content=page_text,
-                            metadata={
-                                "source": uploaded_file.name,
-                                "page": page_number,
-                            },
-                        )
-                    )
-
-        except Exception:
-            st.error(
-                "This PDF could not be opened. "
-                "The file may be corrupted, incomplete, "
-                "or not a valid PDF."
+            cleaned = (
+                clean_extracted_text(
+                    page.extract_text()
+                    or ""
+                )
             )
-            st.stop()
 
+        except Exception as exc:
+
+            raise ValueError(
+                "The PDF could not be read correctly. "
+                "One or more pages may be corrupted "
+                "or incomplete."
+            ) from exc
+
+        page_texts.append(
+            cleaned
+        )
+
+        if cleaned:
+
+            page_documents.append(
+                Document(
+                    page_content=cleaned,
+                    metadata={
+                        "source": source_name,
+                        "page": page_number,
+                    },
+                )
+            )
 
     if not page_documents:
-        st.warning(
+
+        raise ValueError(
             "No extractable text was found in this PDF. "
-            "The document may be empty, scanned, or image-only. "
-            "OCR is not currently supported."
-        )
-        st.stop()
-
-
-    # ----------------------------------------------
-    # CHUNKING
-    # ----------------------------------------------
-
-    with st.spinner("Preparing document context..."):
-
-        text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1000,
-            chunk_overlap=200,
+            "The document may be empty, scanned, "
+            "or image-only. OCR is not currently supported."
         )
 
-        chunks = text_splitter.split_documents(
-            page_documents
-        )
-    # ----------------------------------------------
-    # DOCUMENT STATUS CARD
-    # ----------------------------------------------
-
-    st.markdown(
-        (
-            '<div class="glass-card">'
-            '<div class="section-label">'
-            'Document ready'
-            '</div>'
-            '<div class="doc-name">'
-            f'📄 {uploaded_file.name}'
-            '</div>'
-            '<div class="doc-meta">'
-            f'{len(reader.pages)} pages'
-            ' · '
-            f'{len(chunks)} chunks'
-            ' · Ready to search'
-            '</div>'
-            '</div>'
-        ),
-        unsafe_allow_html=True,
+    return (
+        reader,
+        page_documents,
+        page_texts,
     )
 
 
-    # ----------------------------------------------
-    # EMBEDDINGS + VECTOR STORE
-    # ----------------------------------------------
+# ==================================================
+# CHUNKING
+# ==================================================
 
-    with st.spinner("Creating semantic index..."):
-         vector_store = get_vector_store(chunks)
+def build_chunks(
+    page_documents: list[Document],
+) -> list[Document]:
 
-
-    # ----------------------------------------------
-    # QUESTION
-    # ----------------------------------------------
-
-        # ----------------------------------------------
-    # QUESTION FORM
-    # ----------------------------------------------
-
-    with st.form("question_form"):
-
-        question = st.text_input(
-            "Ask a question about the document",
-            placeholder="Ask anything about your document...",
-            label_visibility="collapsed",
+    splitter = (
+        RecursiveCharacterTextSplitter(
+            chunk_size=CHUNK_SIZE,
+            chunk_overlap=CHUNK_OVERLAP,
         )
+    )
 
-        submitted = st.form_submit_button("Ask")
+    return splitter.split_documents(
+        page_documents
+    )
 
-    clean_question = question.strip()
 
-    # ==================================================
-    # VALIDATION + RAG
-    # ==================================================
+# ==================================================
+# PROMPT
+# ==================================================
 
-if submitted and clean_question:
+def build_prompt(
+    question: str,
+    results: list[Document],
+) -> str:
 
-        has_letters_or_numbers = bool(
-            re.search(
-                r"[A-Za-z0-9]",
-                clean_question
-            )
+    context = "\n\n".join(
+        (
+            f"[Page "
+            f"{item.metadata.get('page', 'Unknown')}"
+            f"]\n"
+            f"{item.page_content}"
         )
+        for item in results
+    )
 
-        # ------------------------------------------
-        # BASIC VALIDATION
-        # ------------------------------------------
+    return f"""
+You are Docu AI, a local document question-answering assistant.
 
-        if len(clean_question) < 3:
-
-            st.warning(
-                "Please enter a longer question."
-            )
-
-
-        elif not has_letters_or_numbers:
-
-            st.warning(
-                "Please enter a question using words, "
-                "not only emojis or symbols."
-            )
-
-
-        elif len(clean_question) > 500:
-
-            st.warning(
-                "Your question is too long. "
-                "Please keep it under 500 characters."
-            )
-
-
-        else:
-
-            # --------------------------------------
-            # SEMANTIC RETRIEVAL
-            # --------------------------------------
-
-            scored_results = (
-                vector_store
-                .similarity_search_with_relevance_scores(
-                    clean_question,
-                    k=5,
-                )
-            )
-
-
-            if not scored_results:
-
-                st.warning(
-                    "I couldn't find anything relevant "
-                    "in this document."
-                )
-
-
-            else:
-
-                best_score = scored_results[0][1]
-
-                # Temporary threshold for this local setup.
-                # We can tune this after testing.
-                if best_score < 0.15:
-
-                    st.warning(
-                        "I couldn't find anything relevant "
-                        "to that question in this document."
-                    )
-
-
-                else:
-
-                    results = [
-                        document
-                        for document, score in scored_results
-                    ]
-
-
-                    context = "\n\n".join(
-                        (
-                            f"[Page "
-                            f"{result.metadata.get('page', 'Unknown')}"
-                            f"]\n"
-                            f"{result.page_content}"
-                        )
-                        for result in results
-                    )
-
-
-                    # ----------------------------------
-                    # GENERATION
-                    # ----------------------------------
-
-                    with st.spinner("Thinking..."):
-
-                        llm = ChatOllama(
-                            model="llama3.2:3b",
-                            temperature=0,
-                        )
-
-
-                        prompt = f"""
-You are a document question-answering assistant.
-
-Answer the user's question using ONLY the document context below.
+Answer the user's question using ONLY the supplied document context.
 
 Rules:
+- Be direct, concise, and useful.
 - Use all relevant information from the context.
-- Preserve the structure and meaning of the source.
-- If the source contains a numbered list or table, follow that structure.
-- Do not split acceptance criteria into separate items unless the source lists them separately.
-- Do not invent information.
-- If the answer truly does not appear in the context, say:
+- Preserve numbered lists and structure when the document uses them.
+- Never invent facts that are not supported by the context.
+- If the answer cannot be supported by the context, say exactly:
   "I could not find the answer in the uploaded document."
 
-Document context:
+Context:
 {context}
 
 Question:
-{clean_question}
+{question}
 
 Answer:
-"""
+""".strip()
 
 
-                        response = llm.invoke(
-                            prompt
-                        )
+# ==================================================
+# SOURCES
+# ==================================================
+
+def unique_sources(
+    results: list[Document],
+    limit: int = 3,
+) -> list[Document]:
+
+    seen: set[
+        tuple[str, object]
+    ] = set()
+
+    sources: list[
+        Document
+    ] = []
+
+    for item in results:
+
+        key = (
+            str(
+                item.metadata.get(
+                    "source",
+                    "Unknown document",
+                )
+            ),
+            item.metadata.get(
+                "page",
+                "Unknown page",
+            ),
+        )
+
+        if key in seen:
+            continue
+
+        seen.add(
+            key
+        )
+
+        sources.append(
+            item
+        )
+
+        if len(sources) >= limit:
+            break
+
+    return sources
 
 
-                    # ----------------------------------
-                    # ANSWER
-                    # ----------------------------------
+# ==================================================
+# TEXT UTIL
+# ==================================================
 
-                    with st.container(
-                        border=True
-                    ):
+def truncate(
+    text: str,
+    limit: int,
+) -> str:
 
-                        st.markdown(
-                            '<div class="section-label">Answer</div>',
-                            unsafe_allow_html=True,
-                        )
+    compact = " ".join(
+        text.split()
+    )
 
-                        st.markdown(
-                            response.content
-                        )
+    if len(compact) <= limit:
+        return compact
 
-
-                    # ----------------------------------
-                    # UNIQUE SOURCES
-                    # ----------------------------------
-
-                    unique_sources = {}
-
-
-                    for result in results:
-
-                        source_name = (
-                            result.metadata.get(
-                                "source",
-                                "Unknown document",
-                            )
-                        )
-
-                        page_number = (
-                            result.metadata.get(
-                                "page",
-                                "Unknown page",
-                            )
-                        )
-
-                        key = (
-                            source_name,
-                            page_number,
-                        )
-
-                        if key not in unique_sources:
-
-                            unique_sources[key] = result
+    return (
+        compact[
+            : limit - 1
+        ].rstrip()
+        + "…"
+    )
 
 
-                    # ----------------------------------
-                    # SOURCE LABEL
-                    # ----------------------------------
 
-                    st.markdown(
-                        (
-                            '<div class="section-label" '
-                            'style="max-width:650px; '
-                            'margin:1.5rem auto 0.7rem auto;">'
-                            'Sources'
-                            '</div>'
-                        ),
-                        unsafe_allow_html=True,
+
+def first_sentence(
+    text: str,
+    limit: int = 300,
+) -> str:
+    """First sentence of a chunk, whitespace-collapsed."""
+
+    compact = " ".join(text.split())
+
+    match = re.match(r"(.+?[.!?])(?=\s|$)", compact)
+
+    sentence = match.group(1) if match else compact
+
+    return sentence[:limit]
+
+
+_STOPWORDS = {
+    "the", "and", "for", "are", "was", "were", "this", "that", "with",
+    "from", "what", "which", "how", "why", "who", "when", "where", "does",
+    "have", "has", "into", "our", "their", "your", "you", "can", "will",
+    "about", "should", "would", "could", "there", "these", "those",
+}
+
+
+def _terms(text: str) -> set[str]:
+    return {
+        word
+        for word in re.findall(r"[a-z0-9]+", text.lower())
+        if len(word) > 2 and word not in _STOPWORDS
+    }
+
+
+def key_passage(
+    chunk_text: str,
+    reference: str,
+    limit: int = 300,
+) -> str:
+    """
+    The sentence of a retrieved chunk that best overlaps the question and
+    answer. Used for the source-card snippet and the preview highlight.
+    """
+
+    compact = " ".join(chunk_text.split())
+    sentences = [
+        sentence.strip()
+        for sentence in re.split(r"(?<=[.!?])\s+", compact)
+        if sentence.strip()
+    ]
+
+    if not sentences:
+        return compact[:limit]
+
+    wanted = _terms(reference)
+
+    def score(sentence: str) -> float:
+        terms = _terms(sentence)
+        if not terms:
+            return 0.0
+        return len(terms & wanted) / len(terms) ** 0.5
+
+    best = max(sentences, key=score)
+
+    return (best if score(best) > 0 else sentences[0])[:limit]
+
+
+def source_passage(
+    source: dict,
+) -> str:
+    return source.get("passage") or first_sentence(source.get("text", ""))
+
+
+def relative_time(
+    timestamp: float | None,
+) -> str:
+    if not timestamp or time.time() - timestamp < 60:
+        return "Just now"
+
+    return time.strftime("%H:%M", time.localtime(timestamp))
+
+
+# ==================================================
+# PDF LOADING (cached per document)
+# ==================================================
+
+@st.cache_data(show_spinner=False, max_entries=20)
+def load_pdf(
+    document_key: str,
+    _data: bytes,
+    source_name: str,
+) -> tuple[int, list[Document], list[str]]:
+
+    reader, page_documents, page_texts = read_pdf(
+        _data,
+        source_name,
+    )
+
+    return len(reader.pages), page_documents, page_texts
+
+
+# ==================================================
+# EMPTY / UPLOAD STATE
+# ==================================================
+
+def render_empty_state():
+
+    st.html(
+        '<div class="upload-shell">'
+        '<h1 class="upload-title">Your documents, understood.</h1>'
+        '<div class="upload-subtitle">'
+        'Drop in a PDF and start a conversation with what matters.'
+        '</div>'
+        '</div>'
+    )
+
+    uploaded = st.file_uploader(
+        "Upload PDF",
+        type=["pdf"],
+        label_visibility="collapsed",
+        key=f"empty_uploader_{st.session_state.uploader_nonce}",
+    )
+
+    upload_error = st.session_state.pop("upload_error", None)
+
+    if upload_error:
+        with st.container(key="upload_error"):
+            st.error(upload_error)
+
+    chips = "".join(
+        f'<span class="suggestion-chip">{label}</span>'
+        for label in (
+            "Summarize the key points",
+            "Find important dates",
+            "Compare two sections",
+        )
+    )
+
+    st.html(
+        '<div class="upload-after">'
+        f'<div class="privacy-note">{ICON_LOCK}'
+        'Your files stay private. '
+        'Documents are processed locally with Ollama.'
+        '</div>'
+        '<div class="suggestion-title">Once uploaded, try asking</div>'
+        f'<div class="suggestion-row">{chips}</div>'
+        '</div>'
+    )
+
+    return uploaded
+
+
+# ==================================================
+# CHAT HEADER
+# ==================================================
+
+def render_chat_header(
+    file_name: str,
+    page_count: int,
+) -> None:
+
+    pages_label = "page" if page_count == 1 else "pages"
+
+    st.html(
+        '<div class="chat-page-header">'
+        '<div>'
+        '<div class="chat-page-title">Document chat</div>'
+        '<div class="chat-page-meta">'
+        f'{html.escape(file_name)} &nbsp;·&nbsp; '
+        f'{page_count} {pages_label}'
+        '</div>'
+        '</div>'
+        '<div class="chat-page-actions">'
+        f'<span>Share</span>{ICON_MORE}'
+        '</div>'
+        '</div>'
+    )
+
+
+def render_chat_intro(
+    file_name: str,
+) -> None:
+
+    st.html(
+        '<div class="chat-intro">'
+        '<div class="chat-kicker">'
+        '<span class="kicker-dot"></span>'
+        f'DocU AI &nbsp;·&nbsp; {html.escape(file_name)}'
+        '</div>'
+        '<div class="chat-intro-title">'
+        'I’ve read your document. What would you like to explore?'
+        '</div>'
+        '<div class="chat-intro-subtitle">'
+        'Ask questions, uncover insights, '
+        'and get answers grounded in your file.'
+        '</div>'
+        '</div>'
+    )
+
+
+# ==================================================
+# SOURCE CARDS
+# ==================================================
+
+def page_label(
+    page: object,
+) -> str:
+    return f"{int(page):02d}" if str(page).isdigit() else str(page)
+
+
+def render_sources(
+    sources: list[dict],
+) -> None:
+
+    if not sources:
+        return
+
+    cards = "".join(
+        '<div class="source-card">'
+        '<div class="source-card-label">'
+        f'Source {index:02d} &nbsp;·&nbsp; '
+        f'Page {html.escape(page_label(source.get("page", "?")))}'
+        '</div>'
+        '<div class="source-card-text">'
+        f'{html.escape(truncate(source_passage(source), 120))}'
+        '</div>'
+        '</div>'
+        for index, source in enumerate(sources, start=1)
+    )
+
+    count = len(sources)
+    noun = "reference" if count == 1 else "references"
+
+    st.html(
+        f'<div class="source-heading">Sources &nbsp;·&nbsp; '
+        f'{count} {noun}</div>'
+        f'<div class="source-grid">{cards}</div>'
+    )
+
+
+# ==================================================
+# CHAT MESSAGE
+# ==================================================
+
+def render_message(
+    index: int,
+    message: dict,
+    is_last: bool,
+) -> None:
+
+    if message["role"] == "user":
+        st.html(
+            '<div class="user-bubble">'
+            f'{html.escape(message["content"])}'
+            '</div>'
+        )
+        return
+
+    with st.container(key=f"answer_{index}"):
+
+        st.html(
+            '<div class="assistant-meta">'
+            '<span class="kicker-dot"></span>'
+            f'DocU AI &nbsp;·&nbsp; {relative_time(message.get("time"))}'
+            '</div>'
+        )
+
+        st.markdown(message["content"])
+
+        render_sources(message.get("sources", []))
+
+        is_error = message.get("error", False)
+
+        if is_error and not is_last:
+            return
+
+        with st.container(
+            key=f"actions_{index}",
+            horizontal=True,
+        ):
+
+            if not is_error:
+
+                helpful = message.get("helpful", False)
+
+                if st.button(
+                    "Helpful",
+                    key=(
+                        f"helpful_on_{index}"
+                        if helpful
+                        else f"helpful_{index}"
+                    ),
+                    type="tertiary",
+                    icon=(
+                        ":material/favorite:"
+                        if helpful
+                        else ":material/favorite_border:"
+                    ),
+                ):
+                    message["helpful"] = not helpful
+                    st.rerun()
+
+            if is_last and st.button(
+                "Try again" if is_error else "Regenerate",
+                key=f"regenerate_{index}",
+                type="tertiary",
+                icon=":material/refresh:",
+            ):
+                st.session_state.messages.pop()
+                st.rerun()
+
+
+# ==================================================
+# DOCUMENT PREVIEW
+# ==================================================
+
+def highlight_passages(
+    text: str,
+    passages: list[str],
+) -> tuple[str, int]:
+    """Escape text and wrap each passage found in it in <mark>."""
+
+    spans: list[tuple[int, int]] = []
+
+    for passage in passages:
+
+        words = passage.split()
+
+        if not words:
+            continue
+
+        pattern = r"\s+".join(re.escape(word) for word in words)
+        match = re.search(pattern, text)
+
+        if match:
+            spans.append(match.span())
+
+    spans.sort()
+
+    merged: list[list[int]] = []
+
+    for start, end in spans:
+        if merged and start <= merged[-1][1]:
+            merged[-1][1] = max(merged[-1][1], end)
+        else:
+            merged.append([start, end])
+
+    parts: list[str] = []
+    cursor = 0
+
+    for start, end in merged:
+        parts.append(html.escape(text[cursor:start]))
+        parts.append(f"<mark>{html.escape(text[start:end])}</mark>")
+        cursor = end
+
+    parts.append(html.escape(text[cursor:]))
+
+    return "".join(parts), len(merged)
+
+
+def latest_sources() -> list[dict]:
+    for message in reversed(st.session_state.messages):
+        if message["role"] == "assistant":
+            return message.get("sources", [])
+    return []
+
+
+def render_preview(
+    file_name: str,
+    file_size_mb: float,
+    page_texts: list[str],
+    page_count: int,
+) -> None:
+
+    current = max(1, min(st.session_state.preview_page, page_count))
+    st.session_state.preview_page = current
+
+    size_label = (
+        f"{file_size_mb:.1f} MB"
+        if file_size_mb >= 0.1
+        else f"{file_size_mb * 1024:.0f} KB"
+    )
+
+    st.html(
+        '<div class="preview-file-row">'
+        '<div class="preview-file">'
+        f'{ICON_FILE}'
+        '<div style="min-width:0;">'
+        f'<div class="preview-file-name">{html.escape(file_name)}</div>'
+        f'<div class="preview-file-meta">PDF · {size_label}</div>'
+        '</div>'
+        '</div>'
+        f'<div class="preview-file-actions">{ICON_EXTERNAL}{ICON_MORE}</div>'
+        '</div>'
+    )
+
+    with st.container(
+        key="preview_nav",
+        horizontal=True,
+        vertical_alignment="center",
+    ):
+
+        if st.button(
+            "",
+            key="preview_prev",
+            icon=":material/chevron_left:",
+            disabled=current <= 1,
+            help="Previous page",
+        ):
+            st.session_state.preview_page = current - 1
+            st.rerun()
+
+        st.html(
+            f'<div class="preview-nav-label">'
+            f'Page {current} of {page_count}</div>'
+        )
+
+        if st.button(
+            "",
+            key="preview_next",
+            icon=":material/chevron_right:",
+            disabled=current >= page_count,
+            help="Next page",
+        ):
+            st.session_state.preview_page = current + 1
+            st.rerun()
+
+    page_text = (
+        page_texts[current - 1]
+        if current - 1 < len(page_texts)
+        else ""
+    )[:4000]
+
+    lines = page_text.split("\n", 1)
+    title = truncate(lines[0], 80) if page_text else ""
+    body = lines[1].strip() if len(lines) > 1 else ""
+
+    sources = latest_sources()
+
+    page_passages = [
+        source_passage(source)
+        for source in sources
+        if str(source.get("page")) == str(current)
+    ]
+
+    body_markup, _ = highlight_passages(body, page_passages)
+    title_markup = html.escape(title)
+
+    stem = html.escape(Path(file_name).stem)
+
+    if not page_text:
+        title_markup = ""
+        body_markup = "No extractable text on this page."
+
+    st.html(
+        '<div class="pdf-paper">'
+        f'<div class="pdf-paper-kicker">{stem}</div>'
+        f'<div class="pdf-paper-title">{title_markup}</div>'
+        '<div class="pdf-paper-meta">'
+        f'Page {current:02d} &nbsp;·&nbsp; Extracted text'
+        '</div>'
+        f'<div class="pdf-paper-body">{body_markup}</div>'
+        f'<div class="pdf-paper-footer">DocU AI &nbsp;·&nbsp; {stem}</div>'
+        '</div>'
+    )
+
+    count = len(sources)
+
+    if count:
+        noun = "passage" if count == 1 else "passages"
+        st.html(
+            f'<div class="preview-footer">{count} {noun} highlighted</div>'
+        )
+
+
+# ==================================================
+# QUESTION → ANSWER
+# ==================================================
+
+def answer_question(
+    question: str,
+    vector_store: Chroma,
+) -> dict:
+
+    error = validate_question(
+        question
+    )
+
+    if error:
+        return {
+            "error": error
+        }
+
+    scored_results = (
+        vector_store
+        .similarity_search_with_relevance_scores(
+            question,
+            k=TOP_K,
+        )
+    )
+
+    if not scored_results:
+
+        return {
+            "error":
+            "I couldn't find anything relevant "
+            "in this document."
+        }
+
+    best_score = (
+        scored_results[0][1]
+    )
+
+    if (
+        best_score
+        < RELEVANCE_THRESHOLD
+    ):
+
+        return {
+            "error":
+            "I couldn't find anything relevant "
+            "to that question in this document."
+        }
+
+    results = [
+        document
+        for document, _score
+        in scored_results
+    ]
+
+    prompt = build_prompt(
+        question,
+        results,
+    )
+
+    model = ChatOllama(
+        model=MODEL_NAME,
+        temperature=0,
+    )
+
+    model_result = (
+        invoke_ollama_safely(
+            model,
+            prompt,
+        )
+    )
+
+    if not model_result["ok"]:
+
+        return {
+            "error":
+            model_result[
+                "user_message"
+            ]
+        }
+
+    sources = unique_sources(
+        results
+    )
+
+    source_payload = [
+        {
+            "source":
+            item.metadata.get(
+                "source",
+                "Unknown document",
+            ),
+            "page":
+            item.metadata.get(
+                "page",
+                "?",
+            ),
+            "text":
+            item.page_content,
+        }
+        for item in sources
+    ]
+
+    return {
+        "answer":
+        model_result[
+            "content"
+        ],
+        "sources":
+        source_payload,
+    }
+
+
+
+
+# ==================================================
+# DOCUMENT CHAT STATE
+# ==================================================
+
+def try_open_upload(
+    name: str,
+    data: bytes,
+) -> str | None:
+    """Validate and open an uploaded PDF. Returns an error message or None."""
+
+    if len(data) > MAX_UPLOAD_MB * 1024 * 1024:
+        return f"This PDF is larger than {MAX_UPLOAD_MB} MB."
+
+    try:
+        load_pdf(
+            hashlib.sha256(data).hexdigest(),
+            data,
+            name,
+        )
+    except ValueError as exc:
+        return str(exc)
+
+    open_document(name, data)
+
+    return None
+
+
+def answer_pending_question(
+    vector_store: Chroma,
+) -> None:
+
+    question = st.session_state.messages[-1]["content"]
+
+    with st.spinner("Reading the relevant passages…"):
+        result = answer_question(question, vector_store)
+
+    if "error" in result:
+        st.session_state.messages.append(
+            {
+                "role": "assistant",
+                "content": result["error"],
+                "sources": [],
+                "error": True,
+                "time": time.time(),
+            }
+        )
+        return
+
+    sources = result["sources"]
+    reference = f"{question} {result['answer']}"
+
+    for source in sources:
+        source["passage"] = key_passage(source["text"], reference)
+
+    st.session_state.source_pages = [
+        int(source["page"])
+        for source in sources
+        if str(source["page"]).isdigit()
+    ]
+
+    if st.session_state.source_pages:
+        st.session_state.preview_page = st.session_state.source_pages[0]
+
+    st.session_state.messages.append(
+        {
+            "role": "assistant",
+            "content": result["answer"],
+            "sources": sources,
+            "time": time.time(),
+        }
+    )
+
+
+def scroll_to_latest(
+    message_count: int,
+) -> None:
+    """
+    Keep the newest message in view. The message count is part of the
+    markup, so the script only re-runs when the conversation grows.
+    """
+
+    st.html(
+        f"<script>/* messages: {message_count} */"
+        "(() => {"
+        "const pane = window.parent.document.querySelector("
+        "'.st-key-chat_scroll') || document.querySelector("
+        "'.st-key-chat_scroll');"
+        "if (pane) requestAnimationFrame(() => pane.scrollTo("
+        "{top: pane.scrollHeight, behavior: 'smooth'}));"
+        "})();</script>",
+        unsafe_allow_javascript=True,
+    )
+
+
+def render_chat_state(
+    document: dict,
+) -> None:
+
+    data = document["bytes"]
+    name = document["name"]
+    document_key = document["key"]
+
+    page_count, page_documents, page_texts = load_pdf(
+        document_key,
+        data,
+        name,
+    )
+
+    with st.spinner("Preparing your document…"):
+        vector_store = get_vector_store(
+            document_key,
+            build_chunks(page_documents),
+        )
+
+    chat_col, preview_col = st.columns(
+        [1.6, 1],
+        gap=None,
+    )
+
+    # Render the preview first so it stays visible while an answer runs.
+    with preview_col:
+        with st.container(key="preview_panel"):
+            render_preview(
+                name,
+                len(data) / (1024 * 1024),
+                page_texts,
+                page_count,
+            )
+
+    with chat_col:
+        with st.container(key="chat_pane"):
+
+            render_chat_header(name, page_count)
+
+            with st.container(key="chat_scroll"):
+
+                render_chat_intro(name)
+
+                messages = st.session_state.messages
+
+                for index, message in enumerate(messages):
+                    render_message(
+                        index,
+                        message,
+                        is_last=index == len(messages) - 1,
                     )
 
+                if messages:
+                    scroll_to_latest(len(messages))
 
-                    # ----------------------------------
-                    # SOURCE CARDS
-                    # ----------------------------------
+                if messages and messages[-1]["role"] == "user":
+                    answer_pending_question(vector_store)
+                    st.rerun()
 
-                    for result in unique_sources.values():
+            with st.container(key="chat_composer"):
 
-                        source_name = (
-                            result.metadata.get(
-                                "source",
-                                "Unknown document",
-                            )
-                        )
+                submission = st.chat_input(
+                    "Ask anything about this document…",
+                    key=f"chat_input_{document_key}",
+                    accept_file=True,
+                    file_type=["pdf"],
+                    max_upload_size=MAX_UPLOAD_MB,
+                )
 
-                        page_number = (
-                            result.metadata.get(
-                                "page",
-                                "Unknown page",
-                            )
-                        )
+                st.html(
+                    '<div class="composer-footer">'
+                    '<span>↵ to send &nbsp;·&nbsp; '
+                    'Answers are grounded in your files</span>'
+                    '<span class="processed-note">'
+                    '<span class="processed-dot"></span>'
+                    'Processed locally with Ollama</span>'
+                    '</div>'
+                )
 
-                        with st.expander(
-                            f"Page {page_number} · {source_name}"
-                        ):
+    if not submission:
+        return
 
-                            st.write(
-                                result.page_content
-                            )
+    if submission.files:
+        attached = submission.files[0]
+        error = try_open_upload(attached.name, attached.getvalue())
+
+        if error:
+            st.toast(error, icon=":material/error:")
+            return
+
+    question = (submission.text or "").strip()
+
+    if question:
+        st.session_state.messages.append(
+            {
+                "role": "user",
+                "content": question,
+                "time": time.time(),
+            }
+        )
+
+    st.rerun()
 
 
 # ==================================================
-# EMPTY STATE
+# APP ENTRY
 # ==================================================
+
+init_state()
+
+render_sidebar()
+
+current_document = find_document(st.session_state.current_doc_key)
+
+if current_document is None:
+
+    uploaded_file = render_empty_state()
+
+    if uploaded_file is not None:
+
+        upload_error = try_open_upload(
+            uploaded_file.name,
+            uploaded_file.getvalue(),
+        )
+
+        if upload_error:
+            st.session_state.upload_error = upload_error
+
+        # A fresh uploader key clears the widget for the next visit.
+        st.session_state.uploader_nonce += 1
+        st.rerun()
+
+else:
+
+    render_chat_state(current_document)
