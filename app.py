@@ -16,14 +16,12 @@ from langchain_ollama import ChatOllama
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from ollama_error_handling import invoke_ollama_safely
+from query_intent import retrieve_context
 from pdf_validation import has_pdf_signature
 from text_cleaning import clean_extracted_text
 from ui_theme import (
-    ICON_EXTERNAL,
     ICON_FILE,
     ICON_LOCK,
-    ICON_MENU,
-    ICON_MORE,
     LOGO_SVG,
     apply_docu_theme,
     image_data_uri,
@@ -42,7 +40,7 @@ MAX_UPLOAD_MB = 50
 
 
 st.set_page_config(
-    page_title="DocU AI",
+    page_title="DocuAI",
     page_icon="✦",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -100,6 +98,21 @@ def reset_chat() -> None:
     st.session_state.preview_page = 1
 
 
+def ask(
+    question: str,
+) -> None:
+    """Queue a question; the next run answers it in the chat pane."""
+
+    st.session_state.messages.append(
+        {
+            "role": "user",
+            "content": question,
+            "time": time.time(),
+        }
+    )
+    st.rerun()
+
+
 def find_document(
     document_key: str | None,
 ) -> dict | None:
@@ -150,7 +163,7 @@ def logo_markup() -> str:
     return (
         '<div class="docu-brand">'
         f'{visual}'
-        '<div class="docu-brand-name">DocU AI</div>'
+        '<div class="docu-brand-name">DocuAI</div>'
         '</div>'
     )
 
@@ -175,19 +188,7 @@ def render_sidebar() -> None:
             reset_chat()
             st.rerun()
 
-        nav_items = "".join(
-            f'<div class="sidebar-nav-item">{ICON_MENU}'
-            f'<span>{label}</span></div>'
-            for label in (
-                "Overview",
-                "All documents",
-                "Starred",
-            )
-        )
-
         st.html(
-            '<div class="sidebar-section-label">Workspace</div>'
-            f'<div class="sidebar-nav">{nav_items}</div>'
             '<div class="sidebar-section-label">Your documents</div>'
         )
 
@@ -378,9 +379,20 @@ def build_chunks(
 # PROMPT
 # ==================================================
 
+OVERVIEW_INSTRUCTIONS = """
+The user is asking about the document as a whole (for example a summary,
+its main points or what it is about). The context below is a set of
+excerpts sampled from across the whole document, in reading order.
+- Start with one or two sentences describing what the document is about.
+- Then list its main points as a short numbered list.
+- Cover the whole document, not only the first excerpt.
+- Only describe what the excerpts actually say.
+"""
+
 def build_prompt(
     question: str,
     results: list[Document],
+    overview: bool = False,
 ) -> str:
 
     context = "\n\n".join(
@@ -394,10 +406,10 @@ def build_prompt(
     )
 
     return f"""
-You are Docu AI, a local document question-answering assistant.
+You are DocuAI, a local document question-answering assistant.
 
 Answer the user's question using ONLY the supplied document context.
-
+{OVERVIEW_INSTRUCTIONS if overview else ""}
 Rules:
 - Be direct, concise, and useful.
 - Use all relevant information from the context.
@@ -522,6 +534,49 @@ def _terms(text: str) -> set[str]:
     }
 
 
+def split_headings(
+    text: str,
+) -> list[str]:
+    """
+    Split extracted text into segments so headings ("04 Pricing", short
+    lines without end punctuation) are not glued onto the next sentence.
+    """
+
+    segments: list[str] = []
+    current: list[str] = []
+    lines = [line.strip() for line in text.split("\n")]
+
+    for index, line in enumerate(lines):
+
+        if not line:
+            if current:
+                segments.append(" ".join(current))
+                current = []
+            continue
+
+        current.append(line)
+
+        next_line = next(
+            (candidate for candidate in lines[index + 1:] if candidate),
+            "",
+        )
+
+        is_heading = (
+            len(line) <= 60
+            and not re.search(r"[.!?:,;]$", line)
+            and next_line[:1].isupper()
+        )
+
+        if is_heading:
+            segments.append(" ".join(current))
+            current = []
+
+    if current:
+        segments.append(" ".join(current))
+
+    return segments
+
+
 def key_passage(
     chunk_text: str,
     reference: str,
@@ -534,8 +589,9 @@ def key_passage(
 
     compact = " ".join(chunk_text.split())
     sentences = [
-        sentence.strip()
-        for sentence in re.split(r"(?<=[.!?])\s+", compact)
+        " ".join(sentence.split())
+        for segment in split_headings(chunk_text)
+        for sentence in re.split(r"(?<=[.!?])\s+", segment)
         if sentence.strip()
     ]
 
@@ -593,6 +649,14 @@ def load_pdf(
 # EMPTY / UPLOAD STATE
 # ==================================================
 
+# Shown as hints on the upload screen and as one-click questions in a new
+# chat. All three are document-level requests, which always get an answer.
+SUGGESTED_QUESTIONS = (
+    "Summarize the key points",
+    "What is this document about?",
+    "What are the key takeaways?",
+)
+
 def render_empty_state():
 
     st.html(
@@ -618,12 +682,8 @@ def render_empty_state():
             st.error(upload_error)
 
     chips = "".join(
-        f'<span class="suggestion-chip">{label}</span>'
-        for label in (
-            "Summarize the key points",
-            "Find important dates",
-            "Compare two sections",
-        )
+        f'<span class="suggestion-chip">{html.escape(label)}</span>'
+        for label in SUGGESTED_QUESTIONS
     )
 
     st.html(
@@ -653,15 +713,13 @@ def render_chat_header(
 
     st.html(
         '<div class="chat-page-header">'
-        '<div>'
+        '<div class="chat-page-heading">'
         '<div class="chat-page-title">Document chat</div>'
-        '<div class="chat-page-meta">'
-        f'{html.escape(file_name)} &nbsp;·&nbsp; '
-        f'{page_count} {pages_label}'
+        f'<div class="chat-page-meta" title="{html.escape(file_name)}">'
+        f'<span class="chat-page-file">{html.escape(file_name)}</span>'
+        f'<span class="chat-page-pages">&nbsp;·&nbsp; '
+        f'{page_count} {pages_label}</span>'
         '</div>'
-        '</div>'
-        '<div class="chat-page-actions">'
-        f'<span>Share</span>{ICON_MORE}'
         '</div>'
         '</div>'
     )
@@ -675,7 +733,9 @@ def render_chat_intro(
         '<div class="chat-intro">'
         '<div class="chat-kicker">'
         '<span class="kicker-dot"></span>'
-        f'DocU AI &nbsp;·&nbsp; {html.escape(file_name)}'
+        'DocuAI&nbsp;·&nbsp;'
+        f'<span class="chat-kicker-file" title="{html.escape(file_name)}">'
+        f'{html.escape(file_name)}</span>'
         '</div>'
         '<div class="chat-intro-title">'
         'I’ve read your document. What would you like to explore?'
@@ -686,6 +746,14 @@ def render_chat_intro(
         '</div>'
         '</div>'
     )
+
+    if st.session_state.messages:
+        return
+
+    with st.container(key="intro_suggestions", horizontal=True):
+        for index, label in enumerate(SUGGESTED_QUESTIONS):
+            if st.button(label, key=f"suggestion_{index}"):
+                ask(label)
 
 
 # ==================================================
@@ -751,7 +819,7 @@ def render_message(
         st.html(
             '<div class="assistant-meta">'
             '<span class="kicker-dot"></span>'
-            f'DocU AI &nbsp;·&nbsp; {relative_time(message.get("time"))}'
+            f'DocuAI &nbsp;·&nbsp; {relative_time(message.get("time"))}'
             '</div>'
         )
 
@@ -804,11 +872,11 @@ def render_message(
 # DOCUMENT PREVIEW
 # ==================================================
 
-def highlight_passages(
+def passage_spans(
     text: str,
     passages: list[str],
-) -> tuple[str, int]:
-    """Escape text and wrap each passage found in it in <mark>."""
+) -> list[list[int]]:
+    """Merged [start, end) character spans of each passage found in text."""
 
     spans: list[tuple[int, int]] = []
 
@@ -835,17 +903,34 @@ def highlight_passages(
         else:
             merged.append([start, end])
 
+    return merged
+
+
+def highlight_segment(
+    text: str,
+    spans: list[list[int]],
+    start: int,
+    end: int,
+) -> str:
+    """Escaped text[start:end] with the parts covered by spans in <mark>."""
+
     parts: list[str] = []
-    cursor = 0
+    cursor = start
 
-    for start, end in merged:
-        parts.append(html.escape(text[cursor:start]))
-        parts.append(f"<mark>{html.escape(text[start:end])}</mark>")
-        cursor = end
+    for span_start, span_end in spans:
+        span_start = max(span_start, start)
+        span_end = min(span_end, end)
 
-    parts.append(html.escape(text[cursor:]))
+        if span_start >= span_end:
+            continue
 
-    return "".join(parts), len(merged)
+        parts.append(html.escape(text[cursor:span_start]))
+        parts.append(f"<mark>{html.escape(text[span_start:span_end])}</mark>")
+        cursor = span_end
+
+    parts.append(html.escape(text[cursor:end]))
+
+    return "".join(parts)
 
 
 def latest_sources() -> list[dict]:
@@ -876,11 +961,11 @@ def render_preview(
         '<div class="preview-file">'
         f'{ICON_FILE}'
         '<div style="min-width:0;">'
-        f'<div class="preview-file-name">{html.escape(file_name)}</div>'
+        f'<div class="preview-file-name" title="{html.escape(file_name)}">'
+        f'{html.escape(file_name)}</div>'
         f'<div class="preview-file-meta">PDF · {size_label}</div>'
         '</div>'
         '</div>'
-        f'<div class="preview-file-actions">{ICON_EXTERNAL}{ICON_MORE}</div>'
         '</div>'
     )
 
@@ -921,9 +1006,12 @@ def render_preview(
         else ""
     )[:4000]
 
-    lines = page_text.split("\n", 1)
-    title = truncate(lines[0], 80) if page_text else ""
-    body = lines[1].strip() if len(lines) > 1 else ""
+    # The first line is shown as the page title, the rest as the body.
+    # Passages are matched on the whole page so one that starts in the
+    # title line is highlighted in both.
+    title_end = page_text.find("\n")
+    title_end = len(page_text) if title_end == -1 else title_end
+    body_start = title_end + 1
 
     sources = latest_sources()
 
@@ -933,8 +1021,13 @@ def render_preview(
         if str(source.get("page")) == str(current)
     ]
 
-    body_markup, _ = highlight_passages(body, page_passages)
-    title_markup = html.escape(title)
+    spans = passage_spans(page_text, page_passages)
+    title_markup = highlight_segment(
+        page_text, spans, 0, min(title_end, 80)
+    )
+    body_markup = highlight_segment(
+        page_text, spans, body_start, len(page_text)
+    ).strip()
 
     stem = html.escape(Path(file_name).stem)
 
@@ -950,7 +1043,7 @@ def render_preview(
         f'Page {current:02d} &nbsp;·&nbsp; Extracted text'
         '</div>'
         f'<div class="pdf-paper-body">{body_markup}</div>'
-        f'<div class="pdf-paper-footer">DocU AI &nbsp;·&nbsp; {stem}</div>'
+        f'<div class="pdf-paper-footer">DocuAI &nbsp;·&nbsp; {stem}</div>'
         '</div>'
     )
 
@@ -959,7 +1052,8 @@ def render_preview(
     if count:
         noun = "passage" if count == 1 else "passages"
         st.html(
-            f'<div class="preview-footer">{count} {noun} highlighted</div>'
+            f'<div class="preview-footer">{count} cited {noun} '
+            f'&nbsp;·&nbsp; {len(spans)} on this page</div>'
         )
 
 
@@ -970,6 +1064,7 @@ def render_preview(
 def answer_question(
     question: str,
     vector_store: Chroma,
+    chunks: list[Document],
 ) -> dict:
 
     error = validate_question(
@@ -981,46 +1076,26 @@ def answer_question(
             "error": error
         }
 
-    scored_results = (
-        vector_store
-        .similarity_search_with_relevance_scores(
-            question,
-            k=TOP_K,
-        )
+    retrieval = retrieve_context(
+        question,
+        vector_store,
+        chunks,
+        top_k=TOP_K,
+        relevance_threshold=RELEVANCE_THRESHOLD,
     )
 
-    if not scored_results:
-
+    if "error" in retrieval:
         return {
-            "error":
-            "I couldn't find anything relevant "
-            "in this document."
+            "error": retrieval["error"]
         }
 
-    best_score = (
-        scored_results[0][1]
-    )
-
-    if (
-        best_score
-        < RELEVANCE_THRESHOLD
-    ):
-
-        return {
-            "error":
-            "I couldn't find anything relevant "
-            "to that question in this document."
-        }
-
-    results = [
-        document
-        for document, _score
-        in scored_results
-    ]
+    results = retrieval["results"]
+    overview = retrieval["mode"] == "overview"
 
     prompt = build_prompt(
         question,
         results,
+        overview=overview,
     )
 
     model = ChatOllama(
@@ -1044,8 +1119,10 @@ def answer_question(
             ]
         }
 
+    # An overview draws on more of the document, so cite a little more.
     sources = unique_sources(
-        results
+        results,
+        limit=4 if overview else 3,
     )
 
     source_payload = [
@@ -1107,12 +1184,13 @@ def try_open_upload(
 
 def answer_pending_question(
     vector_store: Chroma,
+    chunks: list[Document],
 ) -> None:
 
     question = st.session_state.messages[-1]["content"]
 
     with st.spinner("Reading the relevant passages…"):
-        result = answer_question(question, vector_store)
+        result = answer_question(question, vector_store, chunks)
 
     if "error" in result:
         st.session_state.messages.append(
@@ -1186,10 +1264,12 @@ def render_chat_state(
         name,
     )
 
+    chunks = build_chunks(page_documents)
+
     with st.spinner("Preparing your document…"):
         vector_store = get_vector_store(
             document_key,
-            build_chunks(page_documents),
+            chunks,
         )
 
     chat_col, preview_col = st.columns(
@@ -1229,7 +1309,7 @@ def render_chat_state(
                     scroll_to_latest(len(messages))
 
                 if messages and messages[-1]["role"] == "user":
-                    answer_pending_question(vector_store)
+                    answer_pending_question(vector_store, chunks)
                     st.rerun()
 
             with st.container(key="chat_composer"):
@@ -1266,13 +1346,7 @@ def render_chat_state(
     question = (submission.text or "").strip()
 
     if question:
-        st.session_state.messages.append(
-            {
-                "role": "user",
-                "content": question,
-                "time": time.time(),
-            }
-        )
+        ask(question)
 
     st.rerun()
 

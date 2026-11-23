@@ -53,13 +53,6 @@ def _icon_css() -> str:
     )
 
 
-ICON_MENU = _register(
-    "menu",
-    '<line x1="4" y1="6" x2="20" y2="6"/>'
-    '<line x1="4" y1="12" x2="20" y2="12"/>'
-    '<line x1="4" y1="18" x2="20" y2="18"/>',
-)
-
 ICON_FILE = _register(
     "file",
     '<path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/>'
@@ -74,15 +67,12 @@ ICON_LOCK = _register(
     color="#22B14C",
 )
 
-ICON_EXTERNAL = _register(
-    "external",
-    '<path d="M7 17 17 7"/><path d="M8 7h9v9"/>',
-)
-
-ICON_MORE = _register(
-    "more",
-    '<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/>'
-    '<circle cx="19" cy="12" r="1"/>',
+# Used only as a CSS background for Streamlit's sidebar toggle buttons.
+_register(
+    "sidebar",
+    '<rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/>'
+    '<line x1="9.5" y1="4.5" x2="9.5" y2="19.5"/>',
+    color="#6B6A75",
 )
 
 LOGO_SVG = _register(
@@ -142,6 +132,7 @@ THEME_CSS = """
     --docu-sidebar: #F7F6FE;
     --docu-preview: #F8F8FB;
     --docu-green: #22B14C;
+    --docu-sidebar-icon: url("__SIDEBAR_ICON__");
     --docu-blue: #3B5BDB;
     --docu-blue-soft: #EDF0FD;
 }
@@ -164,9 +155,6 @@ html, body, [class*="css"], .stApp {
     background: center / contain no-repeat;
     vertical-align: middle;
 }
-
-.preview-file-actions .docu-icon,
-.chat-page-actions .docu-icon { width: 15px; height: 15px; }
 
 .docu-brand-mark {
     flex: none;
@@ -202,8 +190,23 @@ footer {
 [data-testid="stSidebar"] {
     background: var(--docu-sidebar);
     border-right: 1px solid var(--docu-border);
+}
+
+/* Fixed width only while open, so collapsing really hides the sidebar. */
+[data-testid="stSidebar"][aria-expanded="true"] {
     min-width: 222px !important;
     max-width: 222px !important;
+}
+
+/* Collapsed: nothing of the sidebar may leak out; the floating expand
+   button is the only affordance left. */
+[data-testid="stSidebar"][aria-expanded="false"] {
+    overflow: hidden;
+    border-right: 0;
+}
+
+[data-testid="stSidebar"][aria-expanded="false"] [data-testid="stSidebarContent"] {
+    visibility: hidden;
 }
 
 [data-testid="stSidebarHeader"] {
@@ -211,11 +214,60 @@ footer {
     top: 0;
     right: 0;
     height: auto;
-    padding: 14px 8px 0 0;
+    padding: 17px 12px 0 0;
     z-index: 2;
 }
 
 [data-testid="stSidebarHeader"] [data-testid="stLogoSpacer"] { display: none; }
+
+/* Sidebar toggle: the same panel icon whether open (inside the sidebar,
+   level with the logo) or closed (a small floating button, top-left). */
+[data-testid="stSidebarCollapseButton"] {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+[data-testid="stSidebarCollapseButton"] button,
+[data-testid="stExpandSidebarButton"] {
+    width: 30px !important;
+    height: 30px !important;
+    padding: 0 !important;
+    border-radius: 8px !important;
+    background: transparent center / 17px no-repeat !important;
+    transition: background-color .15s ease;
+}
+
+[data-testid="stSidebarCollapseButton"] button,
+[data-testid="stExpandSidebarButton"] {
+    background-image: var(--docu-sidebar-icon) !important;
+}
+
+[data-testid="stSidebarCollapseButton"] button:hover,
+[data-testid="stExpandSidebarButton"]:hover {
+    background-color: #ECEAF6 !important;
+}
+
+[data-testid="stSidebarCollapseButton"] button:focus-visible,
+[data-testid="stExpandSidebarButton"]:focus-visible {
+    outline: 2px solid var(--docu-purple);
+    outline-offset: 2px;
+}
+
+[data-testid="stSidebarCollapseButton"] button > span,
+[data-testid="stExpandSidebarButton"] > span {
+    display: none !important;
+}
+
+[data-testid="stExpandSidebarButton"] {
+    position: fixed !important;
+    top: 16px;
+    left: 16px;
+    z-index: 1000;
+    border: 1px solid var(--docu-border) !important;
+    background-color: #FFFFFF !important;
+    box-shadow: 0 2px 8px rgba(29, 29, 31, 0.06);
+}
 
 [data-testid="stSidebarUserContent"] {
     padding: 18px 15px 16px 15px !important;
@@ -272,23 +324,6 @@ footer {
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-}
-
-.sidebar-nav {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-}
-
-.sidebar-nav-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    height: 42px;
-    padding: 0 9px;
-    border-radius: 8px;
-    color: var(--docu-text-2);
-    font-size: 12.5px;
 }
 
 
@@ -365,7 +400,7 @@ footer {
 .upload-shell {
     max-width: 600px;
     margin: 0 auto;
-    padding-top: 160px;
+    padding: clamp(56px, 18vh, 160px) 24px 0 24px;
     text-align: center;
 }
 
@@ -453,22 +488,61 @@ footer {
 }
 
 [data-testid="stFileUploaderDropzone"] button {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    min-width: 120px;
     height: 41px;
-    padding: 0 21px !important;
+    min-height: 41px !important;
+    padding: 0 22px !important;
     border: 0 !important;
-    border-radius: 8px !important;
+    border-radius: 9px !important;
     background: var(--docu-purple) !important;
     color: #FFFFFF !important;
+    box-shadow: 0 4px 12px rgba(116, 98, 232, 0.22);
+    transition: background-color .15s ease, box-shadow .15s ease;
 }
 
-[data-testid="stFileUploaderDropzone"] button:hover { background: var(--docu-purple-dark) !important; }
-[data-testid="stFileUploaderDropzone"] button [data-testid="stIconMaterial"] { display: none; }
-[data-testid="stFileUploaderDropzone"] button p { font-size: 0 !important; }
+[data-testid="stFileUploaderDropzone"] button:hover {
+    background: var(--docu-purple-dark) !important;
+    box-shadow: 0 6px 16px rgba(116, 98, 232, 0.28);
+}
+
+[data-testid="stFileUploaderDropzone"] button:active { transform: translateY(1px); }
+
+[data-testid="stFileUploaderDropzone"] button:focus-visible {
+    outline: 2px solid var(--docu-purple) !important;
+    outline-offset: 3px;
+}
+
+/* Streamlit renders [icon-slot][label]; hide the slot entirely, not just
+   the glyph, otherwise the label is pushed off-centre by the slot + gap. */
+[data-testid="stFileUploaderDropzone"] button > div,
+[data-testid="stFileUploaderDropzone"] button > div > span {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 0 !important;
+    margin: 0 !important;
+}
+
+[data-testid="stFileUploaderDropzone"] button span:has(> [data-testid="stIconMaterial"]) {
+    display: none !important;
+}
+
+[data-testid="stFileUploaderDropzone"] button [data-testid="stMarkdownContainer"],
+[data-testid="stFileUploaderDropzone"] button p {
+    margin: 0 !important;
+    font-size: 0 !important;
+    line-height: 1 !important;
+}
 
 [data-testid="stFileUploaderDropzone"] button p::after {
     content: "Choose PDF";
     font-size: 14px;
     font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.005em;
 }
 
 .upload-after {
@@ -505,6 +579,31 @@ footer {
     background: #FFFFFF;
     color: var(--docu-text-2);
     font-size: 11.5px;
+    cursor: default;
+}
+
+.st-key-intro_suggestions {
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+    margin-top: 22px;
+}
+
+.st-key-intro_suggestions button {
+    min-height: 0 !important;
+    padding: 9px 13px !important;
+    border: 1px solid #DEDDE6 !important;
+    border-radius: 8px !important;
+    background: #FFFFFF !important;
+    color: var(--docu-text-2) !important;
+    box-shadow: none !important;
+}
+
+.st-key-intro_suggestions button p { font-size: 12px !important; }
+
+.st-key-intro_suggestions button:hover {
+    border-color: #CFC8F4 !important;
+    background: var(--docu-purple-soft) !important;
+    color: var(--docu-purple-ink) !important;
 }
 
 /* ---------- document chat ---------- */
@@ -529,7 +628,14 @@ footer {
     gap: 16px;
     padding: 20px 32px 22px 32px;
     border-bottom: 1px solid var(--docu-border);
+    transition: padding-left .2s ease;
 }
+
+.stApp:has([data-testid="stSidebar"][aria-expanded="false"]) .chat-page-header {
+    padding-left: 64px;
+}
+
+.chat-page-heading { min-width: 0; }
 
 .chat-page-title {
     color: var(--docu-text);
@@ -538,19 +644,20 @@ footer {
 }
 
 .chat-page-meta {
+    display: flex;
+    min-width: 0;
     margin-top: 6px;
     color: var(--docu-muted);
     font-size: 12.5px;
-}
-
-.chat-page-actions {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    color: var(--docu-text-2);
-    font-size: 12.5px;
     white-space: nowrap;
 }
+
+.chat-page-file {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.chat-page-pages { flex: none; }
 
 [data-testid="stLayoutWrapper"]:has(> .st-key-chat_scroll) {
     flex: 1 1 auto;
@@ -565,6 +672,14 @@ footer {
     gap: 0 !important;
 }
 
+.chat-kicker { min-width: 0; white-space: nowrap; }
+
+.chat-kicker-file {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .chat-kicker,
 .assistant-meta {
     display: flex;
@@ -576,6 +691,7 @@ footer {
 }
 
 .kicker-dot {
+    flex: none;
     width: 9px;
     height: 9px;
     border-radius: 999px;
@@ -764,6 +880,10 @@ footer {
     gap: 0 !important;
 }
 
+[data-testid="stColumn"]:has(> [data-testid="stVerticalBlock"] .st-key-preview_panel) {
+    min-width: 280px;
+}
+
 .preview-file-row {
     display: flex;
     align-items: flex-start;
@@ -794,12 +914,6 @@ footer {
     margin-top: 2px;
     color: var(--docu-muted);
     font-size: 10.5px;
-}
-
-.preview-file-actions {
-    display: flex;
-    gap: 14px;
-    color: var(--docu-muted);
 }
 
 .st-key-preview_nav {
@@ -841,6 +955,7 @@ footer {
 }
 
 .pdf-paper-kicker {
+    overflow-wrap: anywhere;
     color: var(--docu-purple-ink);
     font-size: 10px;
     font-weight: 600;
@@ -849,6 +964,7 @@ footer {
 }
 
 .pdf-paper-title {
+    overflow-wrap: anywhere;
     margin-top: 18px;
     color: var(--docu-text);
     font-size: 24px;
@@ -885,6 +1001,7 @@ footer {
 }
 
 .pdf-paper-footer {
+    overflow-wrap: anywhere;
     margin-top: 22px;
     padding-top: 16px;
     border-top: 1px solid #E8E8EE;
@@ -917,7 +1034,6 @@ footer {
     .st-key-preview_panel { border-left: 0; border-top: 1px solid var(--docu-border); }
     .upload-shell { padding-top: 64px; padding-left: 16px; padding-right: 16px; }
     .upload-title { font-size: 25px; }
-    .chat-page-actions { display: none; }
     .chat-page-header { padding: 60px 16px 16px 16px; }
     .st-key-chat_scroll { padding: 20px 16px; }
     .st-key-chat_composer { padding: 14px 16px; }
@@ -926,7 +1042,10 @@ footer {
     .user-bubble { max-width: 92%; }
     .composer-footer { flex-direction: column; align-items: flex-start; }
 }
-""".replace("__UPLOAD_ARROW__", _UPLOAD_ARROW) + _icon_css()
+""".replace("__UPLOAD_ARROW__", _UPLOAD_ARROW).replace(
+    "__SIDEBAR_ICON__",
+    "data:image/svg+xml," + quote(_ICON_SVGS["sidebar"]),
+) + _icon_css()
 
 
 def apply_docu_theme() -> None:
