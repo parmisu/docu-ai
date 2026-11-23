@@ -1,25 +1,35 @@
-# Docu AI
+# DocuAI
 
-Docu AI is a local Retrieval-Augmented Generation (RAG) application that lets users upload a PDF document and ask natural-language questions about its contents.
+DocuAI is a local-first Retrieval-Augmented Generation (RAG) application for exploring PDF documents through natural-language conversation.
 
-The app extracts text from the PDF, splits it into chunks, creates semantic embeddings, stores them in a vector database, retrieves the most relevant context for each question, and generates an answer using a local language model.
+Upload a PDF, ask focused questions or request a document-level summary, and get grounded answers generated locally with Ollama. DocuAI keeps source-page metadata attached to retrieved context so answers can be traced back to the document.
 
 ---
 
 ## Features
 
-- Upload and process PDF documents
-- Extract text page by page
+- Upload and process PDF documents locally
+- Extract text page by page with source metadata
 - Split long documents into overlapping chunks
-- Generate local semantic embeddings
+- Generate semantic embeddings with Hugging Face Sentence Transformers
 - Store and search embeddings with ChromaDB
-- Retrieve relevant document sections using semantic similarity
-- Generate grounded answers using a local LLM through Ollama
-- Display source document name and page number
-- Deduplicate repeated sources
-- Validate invalid, emoji-only, very short, very long, and unrelated questions
-- Local-first workflow with no paid API required
-- Clean Streamlit interface with custom styling and animations
+- Answer focused questions using semantic retrieval
+- Detect document-level intents such as summaries, key points, and takeaways
+- Build representative context across the document for broad summary requests
+- Generate grounded answers with a local LLM through Ollama
+- Show source document and page references for retrieved evidence
+- Deduplicate repeated source pages
+- Validate invalid, emoji-only, very short, very long, and unsupported questions
+- Handle corrupt, empty, scanned, and image-only PDFs gracefully
+- Run without paid API dependencies
+- Use a redesigned Streamlit interface with:
+  - upload and empty state
+  - document chat
+  - source cards
+  - right-side document preview
+  - session document list
+  - responsive sidebar behavior
+  - local/private processing indicators
 
 ---
 
@@ -33,7 +43,8 @@ The app extracts text from the PDF, splits it into chunks, creates semantic embe
 - ChromaDB
 - Ollama
 - Llama 3.2 3B
-- Git & GitHub
+- Pytest
+- GitHub Actions
 
 ---
 
@@ -41,6 +52,8 @@ The app extracts text from the PDF, splits it into chunks, creates semantic embe
 
 ```text
 PDF Upload
+    ↓
+PDF Validation
     ↓
 Text Extraction
     ↓
@@ -56,38 +69,47 @@ User Question
     ↓
 Input Validation
     ↓
-Semantic Retrieval
+Query Intent Detection
+    ├── Focused question → Semantic Retrieval + Relevance Check
+    └── Document-level request → Representative Whole-Document Context
     ↓
-Relevance Check
-    ↓
-Retrieved Context
+Grounded Prompt
     ↓
 Local LLM via Ollama
     ↓
 Answer + Source Pages
 ```
 
+---
 
 ## Screenshots
 
-### Home
+### Upload
 
-![Docu AI Home](docs/home.png)
+![DocuAI Upload](docs/home.png)
 
-### Document Q&A
+### Document Chat
 
-![Docu AI Answer](docs/answer.png)
+![DocuAI Document Chat](docs/answer.png)
 
 ### Validation / Error Handling
 
-![Docu AI Validation](docs/error.png)
+![DocuAI Validation](docs/error.png)
+
+---
+
+## Local-First by Design
+
+DocuAI is designed to run on the user's machine.
+
+PDF processing, embeddings, vector retrieval, and answer generation stay local. Ollama runs the language model locally, so the core workflow does not require a paid cloud API.
+
+This makes DocuAI useful for private document exploration and local experimentation with RAG systems.
+
+---
 
 ## Deployment
 
-The current version is designed as a local-first application.
+The current version is intended for local execution rather than a standard hosted Streamlit deployment because answer generation depends on a locally running Ollama model.
 
-Because answer generation uses Ollama with a local Llama model, the application is intended to run on a user's machine rather than on a standard hosted Streamlit environment.
-
-This keeps the project free to run and avoids paid API dependencies.
-
-A future version could support optional cloud LLM providers for public deployment.
+A future version could optionally support cloud LLM providers while keeping the local workflow available.
